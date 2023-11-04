@@ -1,0 +1,4 @@
+insert into worker (worker_id, first_name, last_name) values ('d16f795b-3a64-4ce1-9b87-91a8851d5c60', 'Jane', 'Doe'), ('6f1564b1-0cfb-4e13-94a1-6c10f6d9f8e8', 'Carl', 'Smith');
+insert into warehouse(warehouse_id, name, unit, rows_number) values ('123e4567-e89b-12d3-a456-426614174000', 'warehouse1', 'METER', 3);
+insert into worker_warehouse(warehouse_id, worker_id, role) values('123e4567-e89b-12d3-a456-426614174000', 'd16f795b-3a64-4ce1-9b87-91a8851d5c60', 'ADMIN');
+insert into sharing_token(warehouse_id, salt, sharing_token) values ('123e4567-e89b-12d3-a456-426614174000', '$2a$10$Hr33QvDgEBzirFfAqfVeTeOj4ycfLUR3G68pElA26X3yDw+9mA==', 'LUR3G68pElA26X3yDw+9mA==');
