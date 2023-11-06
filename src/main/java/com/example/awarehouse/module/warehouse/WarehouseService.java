@@ -1,14 +1,12 @@
 package com.example.awarehouse.module.warehouse;
 
-import com.example.awarehouse.module.token.SharingToken;
-import com.example.awarehouse.module.warehouse.dto.WarehouseCreation;
-import com.example.awarehouse.module.warehouse.dto.WarehouseListResponseDto;
-import com.example.awarehouse.module.warehouse.dto.WarehouseRequest;
-import com.example.awarehouse.module.warehouse.dto.WarehouseResponseDto;
-import com.example.awarehouse.module.warehouse.group.GroupRepository;
+import com.example.awarehouse.module.warehouse.dto.*;
 import com.example.awarehouse.module.warehouse.group.WarehouseGroup;
+import com.example.awarehouse.module.warehouse.group.WarehouseGroupService;
 import com.example.awarehouse.module.warehouse.mapper.WarehouseMapper;
 import com.example.awarehouse.module.token.SharingTokenService;
+import com.example.awarehouse.module.warehouse.util.exception.exceptions.GroupNotExistException;
+import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
@@ -17,7 +15,9 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.GROUP_NOT_EXIST;
+import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.WAREHOUSE_NOT_EXIST;
 
 @Service
 @AllArgsConstructor
@@ -25,7 +25,7 @@ public class WarehouseService {
     WorkerWarehouseService workerWarehouseService;
     SharingTokenService sharingTokenService;
     WarehouseRepository warehouseRepository;
-    GroupRepository groupRepository;
+    WarehouseGroupService groupService;
     Validator validator;
 
 
@@ -54,18 +54,24 @@ public class WarehouseService {
     }
 
     private Warehouse warehouseCreationToWarehouse(WarehouseCreation warehouseCreation) {
-        Set<WarehouseGroup> warehouseGroups = findGroups(warehouseCreation.groupIds());
+        Set<WarehouseGroup> warehouseGroups = groupService.getGroups(warehouseCreation.groupIds());
         Warehouse warehouse = WarehouseMapper.toWarehouse(warehouseCreation, warehouseGroups);
         return warehouse;
-    }
-
-    private Set<WarehouseGroup> findGroups(Set<Long> groupsId) {
-        return Optional.ofNullable(groupRepository.findAllById(groupsId)).orElseGet(Collections::emptyList).stream().collect(Collectors.toSet());
     }
 
     public List<WarehouseListResponseDto> getWarehouses() {
         UUID workerId = workerId();
         return workerWarehouseService.getWarehouses(workerId);
+    }
+
+    public void addWarehouseToGroup(Long groupId, WarehouseIdDto warehouseIdDto) {
+        Warehouse warehouse = getWarehouse(warehouseIdDto.id()).orElseThrow(()->new WarehouseNotExistException(WAREHOUSE_NOT_EXIST));
+        WarehouseGroup group = groupService.getGroup(groupId).orElseThrow(()->new GroupNotExistException(GROUP_NOT_EXIST));
+        warehouse.addGroup(group);
+    }
+
+    public Optional<Warehouse> getWarehouse(UUID warehouseId){
+        return warehouseRepository.findById(warehouseId);
     }
 
 }

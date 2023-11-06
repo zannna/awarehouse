@@ -3,10 +3,7 @@ package com.example.awarehouse.module.warehouse;
 import com.example.awarehouse.module.warehouse.group.WarehouseGroup;
 import com.example.awarehouse.module.token.SharingToken;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -17,6 +14,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Warehouse {
 
     @Id
@@ -63,5 +61,9 @@ public class Warehouse {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public void addGroup(WarehouseGroup group){
+        warehouseGroups.add(group);
     }
 }

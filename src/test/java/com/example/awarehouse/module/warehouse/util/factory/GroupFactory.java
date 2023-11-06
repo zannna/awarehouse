@@ -11,15 +11,15 @@ import java.util.Set;
 
 public class GroupFactory {
 
-    public static List<WarehouseGroup> createListOfGroups(){
-        return List.of(new WarehouseGroup(1L, "clothes"), new WarehouseGroup(2L,"toys"));
+    public static Set<WarehouseGroup> createListOfGroups(){
+        return Set.of(new WarehouseGroup(1L, "clothes"), new WarehouseGroup(2L,"toys"));
     }
     public  static Set<WarehouseGroup> createSetOfGroups(){
         return createListOfGroups().stream().collect(java.util.stream.Collectors.toSet());
     }
 
-    public  static Set<GroupResponseDto> createSetOfGroupResponseDto(Optional<List<WarehouseGroup>> groups){
-        return groups.orElseGet(Collections::emptyList).stream().map(GroupMapper :: toGroupResponseDto).collect(java.util.stream.Collectors.toSet());
+    public  static Set<GroupResponseDto> createSetOfGroupResponseDto(Optional<Set<WarehouseGroup>> groups){
+        return groups.orElseGet(Collections::emptySet).stream().map(GroupMapper :: toGroupResponseDto).collect(java.util.stream.Collectors.toSet());
     }
 
 

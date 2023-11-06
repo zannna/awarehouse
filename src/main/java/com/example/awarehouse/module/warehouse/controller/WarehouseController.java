@@ -1,10 +1,7 @@
 package com.example.awarehouse.module.warehouse.controller;
 
 import com.example.awarehouse.module.warehouse.WarehouseService;
-import com.example.awarehouse.module.warehouse.dto.WarehouseCreation;
-import com.example.awarehouse.module.warehouse.dto.WarehouseListResponseDto;
-import com.example.awarehouse.module.warehouse.dto.WarehouseRequest;
-import com.example.awarehouse.module.warehouse.dto.WarehouseResponseDto;
+import com.example.awarehouse.module.warehouse.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,14 +42,9 @@ public class WarehouseController {
         return ResponseEntity.status(HttpStatus.OK).body(warehouses);
     }
 
-
-//    @GetMapping
-//    public void cos(){
-//        System.out.println("kotek");
-//        Jwt token= (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        String firstName = token.getClaim("given_name");
-//        String lastName =  token.getClaim("family_name");
-//
-//       // String userId = keycloakPrincipal.getName(); // This is the user's I
-//    }
+    @PostMapping("/{groupId}")
+    ResponseEntity<HttpStatus> addWarehouseToGroup(@PathVariable Long groupId, @RequestBody WarehouseIdDto warehouseIdDto){
+        warehouseService.addWarehouseToGroup(groupId, warehouseIdDto);
+        return  ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

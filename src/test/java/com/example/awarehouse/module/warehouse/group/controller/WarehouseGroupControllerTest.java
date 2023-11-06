@@ -14,8 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static com.example.awarehouse.module.warehouse.group.util.factory.WarehouseGroupFactory.createGroupResponse;
 import static com.example.awarehouse.module.warehouse.group.util.factory.WarehouseGroupFactory.createWarehouseGroupJson;
-import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.GROUP_ALREADY_EXIST;
-import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.kurwa;
+
 import static com.example.awarehouse.util.Constants.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;

@@ -9,7 +9,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.GROUP_ALREADY_EXIST;
 
@@ -35,4 +39,12 @@ public class WarehouseGroupService {
         Jwt token= (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return UUID.fromString(token.getClaim("sub"));
     }
+
+    public Set<WarehouseGroup> getGroups(Set<Long> groupsId) {
+        return Optional.ofNullable(groupRepository.findAllById(groupsId)).orElseGet(Collections::emptyList).stream().collect(Collectors.toSet());
+    }
+    public Optional<WarehouseGroup> getGroup(Long groupId){
+        return groupRepository.findById(groupId);
+    }
+
 }
