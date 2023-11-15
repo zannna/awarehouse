@@ -1,7 +1,6 @@
 package com.example.awarehouse.module.token.controller;
 
 import com.example.awarehouse.module.token.SharingTokenService;
-import com.example.awarehouse.module.token.controller.SharingTokenController;
 import com.example.awarehouse.module.token.dto.SharingTokenResponse;
 import com.example.awarehouse.module.token.dto.WarehouseId;
 import com.example.awarehouse.module.token.exception.exceptions.SharingTokenNotExist;
@@ -16,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static com.example.awarehouse.exception.util.constants.ExceptionConstants.SHARINGTOKEN_NOT_EXIST;
 import static com.example.awarehouse.exception.util.constants.ExceptionConstants.WAREHOUSE_NOT_CONTAIN_SHARINGTOKEN;
 import static com.example.awarehouse.module.token.util.SharingTestConstants.SHARING_TOKEN;
-import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.WAREHOUSE_ID;
+import static com.example.awarehouse.module.warehouse.util.WarehouseTestConstants.WAREHOUSE_ID;
 import static com.example.awarehouse.util.Constants.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

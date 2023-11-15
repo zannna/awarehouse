@@ -14,8 +14,7 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.UUID;
 
-import static com.example.awarehouse.module.token.util.SharingTestConstants.SHARING_TOKEN;
-import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.WAREHOUSE_ID;
+import static com.example.awarehouse.module.warehouse.util.WarehouseTestConstants.WAREHOUSE_ID;
 import static com.example.awarehouse.util.Constants.*;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;

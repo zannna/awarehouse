@@ -6,7 +6,8 @@ import com.example.awarehouse.module.warehouse.Role;
 import com.example.awarehouse.module.warehouse.WarehouseRepository;
 import com.example.awarehouse.module.warehouse.WorkerWarehouse;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseRepository;
-import com.example.awarehouse.module.warehouse.dto.WarehouseListResponseDto;
+import com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto;
+import com.example.awarehouse.module.warehouse.dto.WarehouseIdDto;
 import com.example.awarehouse.module.warehouse.util.factory.WarehouseJsonFactory;
 import com.example.awarehouse.module.worker.WorkerRepository;
 import io.restassured.http.ContentType;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.example.awarehouse.common.util.Constants.WORKER_ID;
+import static com.example.awarehouse.module.warehouse.util.WarehouseTestConstants.WAREHOUSE_ID;
 import static com.example.awarehouse.util.Constants.*;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -76,7 +78,7 @@ public class CreateWarehouseTest extends TestBaseConfiguration {
     void getWarehouses_whenDataAreValid_shouldReturnUUIDList() throws ParseException, URISyntaxException {
         keycloakUserCreation.createBasicUser(keycloak.getAuthServerUrl());
         String jwt = keycloakUserCreation.headerJwt();
-        List<WarehouseListResponseDto> warehouses = given()
+        List<BasicWarehouseInfoDto> warehouses = given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", jwt)
                 .when()
@@ -87,7 +89,7 @@ public class CreateWarehouseTest extends TestBaseConfiguration {
                 .statusCode(HttpStatus.OK.value())
                 .extract()
                 .jsonPath()
-                .getList("$", WarehouseListResponseDto.class);
+                .getList("$", BasicWarehouseInfoDto.class);
 
         warehouses.stream().forEach(warehouse -> System.out.println(warehouse.id() + " " + warehouse.name()));
         assertTrue(warehouses.stream().anyMatch(warehouse -> warehouse.id().equals("123e4567-e89b-12d3-a456-426614174000")
@@ -95,5 +97,27 @@ public class CreateWarehouseTest extends TestBaseConfiguration {
         assertTrue(warehouses.stream().anyMatch(warehouse -> warehouse.id().equals("16aecbfa-7807-11ee-b962-0242ac120002")
                 && warehouse.name().equals("warehouse2")));
         assertThat(warehouses.size()).isEqualTo(2);
+    }
+
+    @Test
+    void addWarehouseToGroup_whenDataAreValid_shouldStatusBeOk() throws ParseException, URISyntaxException {
+        keycloakUserCreation.createBasicUser(keycloak.getAuthServerUrl());
+        String jwt = keycloakUserCreation.headerJwt();
+         given()
+                 .pathParam("groupId", "1")
+                .contentType(ContentType.JSON)
+                .header("Authorization", jwt)
+                 .body(new WarehouseIdDto(WAREHOUSE_ID))
+                .when()
+                .post(URI_VERSION_V1 + URI_WAREHOUSE)
+                .then()
+                .log()
+                .ifValidationFails()
+                .statusCode(HttpStatus.OK.value())
+                .extract()
+                .jsonPath()
+                .getList("$", BasicWarehouseInfoDto.class);
+
+
     }
 }

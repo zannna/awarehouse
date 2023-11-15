@@ -19,7 +19,7 @@ import java.util.UUID;
 import static com.example.awarehouse.exception.util.constants.ExceptionConstants.SHARINGTOKEN_NOT_EXIST;
 import static com.example.awarehouse.exception.util.constants.ExceptionConstants.WAREHOUSE_NOT_CONTAIN_SHARINGTOKEN;
 import static com.example.awarehouse.module.token.util.SharingTokenFactory.createSharingToken;
-import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.WAREHOUSE_ID;
+import static com.example.awarehouse.module.warehouse.util.WarehouseTestConstants.WAREHOUSE_ID;
 import static com.example.awarehouse.module.warehouse.util.factory.WorkerWarehouseFactory.createWorkerWarehouse;
 import static com.example.awarehouse.module.worker.util.WorkerConstants.WORKER_ID;
 import static org.assertj.core.api.Assertions.assertThat;

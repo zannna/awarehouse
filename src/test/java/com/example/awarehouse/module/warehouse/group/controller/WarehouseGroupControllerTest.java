@@ -1,8 +1,9 @@
 package com.example.awarehouse.module.warehouse.group.controller;
 
 import com.example.awarehouse.module.warehouse.group.WarehouseGroupService;
-import com.example.awarehouse.module.warehouse.group.dto.GroupResponse;
+import com.example.awarehouse.module.warehouse.group.dto.BasicGroupInfoDto;
 import com.example.awarehouse.module.warehouse.util.WarehouseConstants;
+import com.example.awarehouse.module.warehouse.util.WarehouseTestConstants;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.GroupDuplicateException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static com.example.awarehouse.module.warehouse.group.util.factory.WarehouseGroupFactory.createGroupResponse;
 import static com.example.awarehouse.module.warehouse.group.util.factory.WarehouseGroupFactory.createWarehouseGroupJson;
-
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static com.example.awarehouse.util.Constants.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -34,8 +35,8 @@ public class WarehouseGroupControllerTest {
     @Test
     void createGroup_whenDataAreValid_shouldCreateGroup() throws Exception {
         //given
-        GroupResponse groupResponse = createGroupResponse();
-        when(warehouseGroupService.createGroup(any())).thenReturn(groupResponse);
+        BasicGroupInfoDto basicGroupInfoDto = createGroupResponse();
+        when(warehouseGroupService.createGroup(any())).thenReturn(basicGroupInfoDto);
         mvc
                 // when
                 .perform(
@@ -50,7 +51,7 @@ public class WarehouseGroupControllerTest {
     @Test
     void createGroup_whenGroupAlreadyExists_shouldThrowException() throws Exception {
         //given
-        GroupResponse groupResponse = createGroupResponse();
+        BasicGroupInfoDto basicGroupInfoDto = createGroupResponse();
         when(warehouseGroupService.createGroup(any())).thenThrow(new GroupDuplicateException(WarehouseConstants.GROUP_ALREADY_EXIST));
 
         mvc
@@ -63,4 +64,5 @@ public class WarehouseGroupControllerTest {
                 // then
                 .andExpect(status().isBadRequest());
     }
+
 }

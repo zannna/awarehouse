@@ -2,6 +2,7 @@ package com.example.awarehouse.module.warehouse;
 
 import com.example.awarehouse.common.util.ContextMock;
 import com.example.awarehouse.module.warehouse.dto.WarehouseCreation;
+import com.example.awarehouse.module.warehouse.dto.WarehouseIdDto;
 import com.example.awarehouse.module.warehouse.dto.WarehouseResponseDto;
 import com.example.awarehouse.module.warehouse.group.WarehouseGroup;
 import com.example.awarehouse.module.token.SharingTokenService;
@@ -9,17 +10,20 @@ import com.example.awarehouse.module.warehouse.group.WarehouseGroupService;
 import com.example.awarehouse.module.warehouse.util.factory.GroupFactory;
 import com.example.awarehouse.module.warehouse.util.factory.WarehouseDtoFactory;
 
+import com.example.awarehouse.module.warehouse.util.factory.WorkerWarehouseFactory;
+import com.example.awarehouse.module.worker.util.factory.WorkerFactory;
 import jakarta.validation.Validator;
-import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import javax.swing.*;
 import java.util.*;
+import java.util.stream.Stream;
 
 import static com.example.awarehouse.common.util.Constants.WORKER_ID;
-import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.WAREHOUSE_ID;
+import static com.example.awarehouse.module.warehouse.util.WarehouseTestConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -58,14 +62,25 @@ class WarehouseServiceTest {
         assertThat(result.rowsNumber()).isEqualTo(warehouseCreation.numberOfRows());
         assertThat(result.groups()).isEqualTo(GroupFactory.createSetOfGroupResponseDto(Optional.ofNullable(warehouseGroups)));
     }
-    @Test
-    void addWarehouseToGroup_whenDataAreValid_thenAddWarehouse(){
+
+    @ParameterizedTest
+    @MethodSource("warehouseProvider")
+    void addWarehouseToGroup_whenDataAreValid_thenAddWarehouse(Optional<Warehouse> warehouse, Set<WarehouseGroup> givenGroups){
         //given
         contextMock.setContext();
-        Optional<Warehouse> warehouse = Optional.of(Warehouse.builder().warehouseGroups(WarehouseGroup).build());
-        Optional<WarehouseGroup> group = Optional.of(new WarehouseGroup());
+        Optional<WarehouseGroup> group = Optional.of(new WarehouseGroup(2L, "Group 2",WorkerFactory.createWorker()));
         when(warehouseRepository.findById(any(UUID.class))).thenReturn(warehouse);
-        when(groupService.getGroup(any(Long.class))).thenReturn();
+        when(groupService.getGroup(any(Long.class))).thenReturn(group);
+        WarehouseService warehouseService = new WarehouseService(workerWarehouseService, sharingTokenService,
+                warehouseRepository, groupService, validator);
+
+        //when
+        warehouseService.addWarehouseToGroup(2L, new WarehouseIdDto(warehouse.get().getId()));
+
+        //then
+        Set<WarehouseGroup> receivedGroups = warehouse.get().getWarehouseGroups();
+        givenGroups.add(group.get());
+        assertThat(receivedGroups).isEqualTo(givenGroups);
     }
 
     static List<Set<WarehouseGroup>> groups() {
@@ -73,6 +88,21 @@ class WarehouseServiceTest {
         result.add(GroupFactory.createListOfGroups());
         result.add(null);
         return result;
+    }
+    static Stream<Arguments> warehouseProvider(){
+        Set<WarehouseGroup> group1 = Set.of(new WarehouseGroup(1L, "Group 1"));
+        Optional<Warehouse> warehouse1 =Optional.of(Warehouse.builder().warehouseGroups(group1)
+                .workerWarehouses(Set.of(WorkerWarehouseFactory.createWorkerWarehouse())).build());
+
+        Set<WarehouseGroup> group2 = Set.of(new WarehouseGroup(2L, "Group 2"));
+        Optional<Warehouse> warehouse2 = Optional.of(Warehouse.builder().warehouseGroups(group2)
+                .workerWarehouses(Set.of(WorkerWarehouseFactory. createSecondWorkerWarehouse())).build());
+
+        return Stream.of(
+                arguments(warehouse1, group1),
+                arguments(warehouse2, group2)
+       );
+
     }
 
 }

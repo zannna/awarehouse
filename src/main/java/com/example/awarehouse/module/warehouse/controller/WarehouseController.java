@@ -5,12 +5,9 @@ import com.example.awarehouse.module.warehouse.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 import static com.example.awarehouse.util.Constants.URI_VERSION_V1;
 import static com.example.awarehouse.util.Constants.URI_WAREHOUSE;
@@ -37,8 +34,8 @@ public class WarehouseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<WarehouseListResponseDto>> getWarehouses(){
-        List<WarehouseListResponseDto> warehouses = warehouseService.getWarehouses();
+    public ResponseEntity<List<BasicWarehouseInfoDto>> getWarehouses(){
+        List<BasicWarehouseInfoDto> warehouses = warehouseService.getWarehouses();
         return ResponseEntity.status(HttpStatus.OK).body(warehouses);
     }
 

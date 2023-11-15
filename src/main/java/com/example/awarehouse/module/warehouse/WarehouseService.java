@@ -22,11 +22,11 @@ import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.WA
 @Service
 @AllArgsConstructor
 public class WarehouseService {
-    WorkerWarehouseService workerWarehouseService;
-    SharingTokenService sharingTokenService;
-    WarehouseRepository warehouseRepository;
-    WarehouseGroupService groupService;
-    Validator validator;
+    private final WorkerWarehouseService workerWarehouseService;
+    private final SharingTokenService sharingTokenService;
+    private final WarehouseRepository warehouseRepository;
+    private final WarehouseGroupService groupService;
+    private final Validator validator;
 
 
     public void updateWarehouse(WarehouseRequest warehouseRequest) {
@@ -59,7 +59,7 @@ public class WarehouseService {
         return warehouse;
     }
 
-    public List<WarehouseListResponseDto> getWarehouses() {
+    public List<BasicWarehouseInfoDto> getWarehouses() {
         UUID workerId = workerId();
         return workerWarehouseService.getWarehouses(workerId);
     }
