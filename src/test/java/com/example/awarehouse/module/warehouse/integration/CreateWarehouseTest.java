@@ -2,12 +2,10 @@ package com.example.awarehouse.module.warehouse.integration;
 
 import com.example.awarehouse.common.config.TestBaseConfiguration;
 import com.example.awarehouse.module.token.SharingTokenRepository;
-import com.example.awarehouse.module.warehouse.Role;
-import com.example.awarehouse.module.warehouse.WarehouseRepository;
-import com.example.awarehouse.module.warehouse.WorkerWarehouse;
-import com.example.awarehouse.module.warehouse.WorkerWarehouseRepository;
+import com.example.awarehouse.module.warehouse.*;
 import com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto;
 import com.example.awarehouse.module.warehouse.dto.WarehouseIdDto;
+import com.example.awarehouse.module.warehouse.group.WarehouseGroup;
 import com.example.awarehouse.module.warehouse.util.factory.WarehouseJsonFactory;
 import com.example.awarehouse.module.worker.WorkerRepository;
 import io.restassured.http.ContentType;
@@ -18,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.example.awarehouse.common.util.Constants.WORKER_ID;
@@ -113,11 +112,12 @@ public class CreateWarehouseTest extends TestBaseConfiguration {
                 .then()
                 .log()
                 .ifValidationFails()
-                .statusCode(HttpStatus.OK.value())
-                .extract()
-                .jsonPath()
-                .getList("$", BasicWarehouseInfoDto.class);
+                .statusCode(HttpStatus.OK.value());
 
+        Warehouse warehouse =  warehouseRepository.findById(WAREHOUSE_ID).get();
+        Set<WarehouseGroup> groups = warehouse.getWarehouseGroups();
+        assertThat(groups.size()).isEqualTo(1);
+        assertThat(groups).allMatch(g->g.getId()== 1);
 
     }
 }
