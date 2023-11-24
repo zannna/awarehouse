@@ -1,10 +1,7 @@
 package com.example.awarehouse.module.product;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
@@ -13,11 +10,13 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Setter
 public class Product {
 
     @Id
     @Column(name = "product_id")
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Setter(AccessLevel.NONE)
     private UUID id;
 
     String title;
@@ -27,7 +26,6 @@ public class Product {
     @Embedded
     Price price;
 
-    String description;
 
     String photo;
 

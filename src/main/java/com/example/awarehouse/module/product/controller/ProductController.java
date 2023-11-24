@@ -5,6 +5,9 @@ import com.example.awarehouse.module.product.dto.LinkDto;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+
 import static com.example.awarehouse.util.Constants.*;
 
 @RestController
@@ -16,7 +19,12 @@ public class ProductController {
 
     @PostMapping(URI_PROVIDER)
     public void createProductsFromSite(@RequestParam String warehouseName, @RequestParam String site,
-                                      @RequestBody LinkDto urlProviderDto){
+                                      @RequestBody LinkDto urlProviderDto) throws IOException {
         productService.createProductsFromSite(warehouseName, site, urlProviderDto);
+    }
+
+    @GetMapping
+    public void getProducts() throws MalformedURLException {
+        productService.fun();
     }
 }

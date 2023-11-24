@@ -20,6 +20,11 @@ services:
       - KEYCLOAK_ADMIN=admin
       - KEYCLOAK_ADMIN_PASSWORD=password
     command: start-dev
+  selenium-hub:
+    image: selenium/standalone-chrome
+    shm_size: 256m
+    ports:
+       - "4444:4444"
 volumes:
   db:
     driver: local
