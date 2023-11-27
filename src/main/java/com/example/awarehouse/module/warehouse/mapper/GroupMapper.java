@@ -1,6 +1,6 @@
 package com.example.awarehouse.module.warehouse.mapper;
 
-import com.example.awarehouse.module.warehouse.group.WarehouseGroup;
+import com.example.awarehouse.module.group.WarehouseGroup;
 import com.example.awarehouse.module.warehouse.dto.GroupResponseDto;
 
 public class GroupMapper {

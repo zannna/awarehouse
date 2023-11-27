@@ -1,11 +1,10 @@
 package com.example.awarehouse.module.warehouse.util.factory;
 
-import com.example.awarehouse.module.warehouse.group.WarehouseGroup;
+import com.example.awarehouse.module.group.WarehouseGroup;
 import com.example.awarehouse.module.warehouse.dto.GroupResponseDto;
 import com.example.awarehouse.module.warehouse.mapper.GroupMapper;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 

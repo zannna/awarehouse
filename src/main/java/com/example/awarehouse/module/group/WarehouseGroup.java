@@ -1,4 +1,4 @@
-package com.example.awarehouse.module.warehouse.group;
+package com.example.awarehouse.module.group;
 
 import com.example.awarehouse.module.worker.Worker;
 import jakarta.persistence.*;
@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
@@ -15,15 +16,15 @@ import java.util.Objects;
 public class WarehouseGroup {
     @Id
     @Column(name = "group_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "worker_id")
     private Worker worker;
 
-    public WarehouseGroup(long id, String name) {
+    public WarehouseGroup(UUID id, String name) {
         this.id = id;
         this.name = name;
     }

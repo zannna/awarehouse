@@ -1,5 +1,6 @@
 package com.example.awarehouse.module.warehouse.shelve;
 
+import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.shelve.tier.Tier;
 import jakarta.persistence.*;
 
@@ -34,5 +35,9 @@ public class Shelve {
 
     @OneToMany(mappedBy="shelve")
     private Set<Tier> tiers= new HashSet<>();
+
+    @ManyToOne
+    @JoinColumn(name = "warehouse_id", nullable = false)
+    private Warehouse warehouse;
 
 }

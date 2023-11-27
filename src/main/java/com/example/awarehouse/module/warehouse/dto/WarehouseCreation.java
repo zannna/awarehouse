@@ -6,7 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.lang.NonNull;
 
 import java.util.Set;
+import java.util.UUID;
 
 public record WarehouseCreation(@NotBlank String name, @NonNull LengthUnit unit, @Min(value = 0) int numberOfRows,
-                                Set<Long> groupIds) {
+                                Set<UUID> groupIds) {
 }

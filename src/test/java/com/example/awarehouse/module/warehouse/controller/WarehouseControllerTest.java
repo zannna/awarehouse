@@ -1,11 +1,7 @@
 package com.example.awarehouse.module.warehouse.controller;
 
 import com.example.awarehouse.module.warehouse.WarehouseService;
-import com.example.awarehouse.module.warehouse.dto.WarehouseCreation;
 import com.example.awarehouse.module.warehouse.dto.WarehouseIdDto;
-import com.example.awarehouse.module.warehouse.group.dto.BasicGroupInfoDto;
-import com.example.awarehouse.module.warehouse.util.WarehouseConstants;
-import com.example.awarehouse.module.warehouse.util.exception.exceptions.GroupDuplicateException;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.GroupNotExistException;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
 import org.junit.jupiter.api.Test;
@@ -21,19 +17,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.GROUP_NOT_EXIST;
 import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.WAREHOUSE_NOT_EXIST;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.doThrow;
-import static com.example.awarehouse.module.warehouse.group.util.factory.WarehouseGroupFactory.createGroupResponse;
-import static com.example.awarehouse.module.warehouse.group.util.factory.WarehouseGroupFactory.createWarehouseGroupJson;
 import static com.example.awarehouse.module.warehouse.util.factory.WarehouseJsonFactory.*;
 import static com.example.awarehouse.util.Constants.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -94,7 +87,7 @@ class WarehouseControllerTest {
     @MethodSource("addWarehouseToGroupException")
     void addWarehouseToGroup_whenInValidInput_thenThrowException(RuntimeException exception, String exceptionMessage) throws Exception {
         //given
-        doThrow(exception).when(warehouseService).addWarehouseToGroup(any(Long.class), any(WarehouseIdDto.class));
+        doThrow(exception).when(warehouseService).addWarehouseToGroup(any(UUID.class), any(WarehouseIdDto.class));
         mvc
                 // when
                 .perform(

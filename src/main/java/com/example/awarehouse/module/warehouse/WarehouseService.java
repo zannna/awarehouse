@@ -1,8 +1,8 @@
 package com.example.awarehouse.module.warehouse;
 
 import com.example.awarehouse.module.warehouse.dto.*;
-import com.example.awarehouse.module.warehouse.group.WarehouseGroup;
-import com.example.awarehouse.module.warehouse.group.WarehouseGroupService;
+import com.example.awarehouse.module.group.WarehouseGroup;
+import com.example.awarehouse.module.group.WarehouseGroupService;
 import com.example.awarehouse.module.warehouse.mapper.WarehouseMapper;
 import com.example.awarehouse.module.token.SharingTokenService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.GroupNotExistException;
@@ -64,7 +64,7 @@ public class WarehouseService {
         return workerWarehouseService.getWarehouses(workerId);
     }
 
-    public void addWarehouseToGroup(Long groupId, WarehouseIdDto warehouseIdDto) {
+    public void addWarehouseToGroup(UUID groupId, WarehouseIdDto warehouseIdDto) {
         Warehouse warehouse = getWarehouse(warehouseIdDto.id()).orElseThrow(()->new WarehouseNotExistException(WAREHOUSE_NOT_EXIST));
         WarehouseGroup group = groupService.getGroup(groupId).orElseThrow(()->new GroupNotExistException(GROUP_NOT_EXIST));
         warehouse.addGroup(group);

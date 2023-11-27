@@ -1,8 +1,10 @@
 package com.example.awarehouse.module.product;
 
+import com.example.awarehouse.module.group.WarehouseGroup;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -19,15 +21,21 @@ public class Product {
     @Setter(AccessLevel.NONE)
     private UUID id;
 
-    String title;
+    private String title;
 
-    double amount;
+    private double amount;
 
     @Embedded
-    Price price;
+    private Price price;
 
 
-    String photo;
+    private String photo;
 
+    @OneToOne
+    @JoinColumn(name = "group_id")
+   private WarehouseGroup group;
+
+   @OneToMany(mappedBy = "product")
+   private Set<ProductWarehouse> productWarehouse;
 
 }

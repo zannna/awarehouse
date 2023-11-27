@@ -1,6 +1,6 @@
 package com.example.awarehouse.module.warehouse.group.util.factory;
 
-import com.example.awarehouse.module.warehouse.group.dto.BasicGroupInfoDto;
+import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
 
 import java.util.Set;
 

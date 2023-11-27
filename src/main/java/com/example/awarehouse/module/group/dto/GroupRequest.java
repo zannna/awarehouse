@@ -1,4 +1,4 @@
-package com.example.awarehouse.module.warehouse.group.dto;
+package com.example.awarehouse.module.group.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

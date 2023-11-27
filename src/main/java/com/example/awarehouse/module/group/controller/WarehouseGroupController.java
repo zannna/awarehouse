@@ -1,9 +1,9 @@
-package com.example.awarehouse.module.warehouse.group.controller;
+package com.example.awarehouse.module.group.controller;
 
+import com.example.awarehouse.module.group.WarehouseGroupService;
+import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
+import com.example.awarehouse.module.group.dto.GroupRequest;
 import com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto;
-import com.example.awarehouse.module.warehouse.group.WarehouseGroupService;
-import com.example.awarehouse.module.warehouse.group.dto.GroupRequest;
-import com.example.awarehouse.module.warehouse.group.dto.BasicGroupInfoDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

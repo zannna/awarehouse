@@ -1,9 +1,9 @@
 package com.example.awarehouse.module.warehouse.group.controller;
 
-import com.example.awarehouse.module.warehouse.group.WarehouseGroupService;
-import com.example.awarehouse.module.warehouse.group.dto.BasicGroupInfoDto;
+import com.example.awarehouse.module.group.WarehouseGroupService;
+import com.example.awarehouse.module.group.controller.WarehouseGroupController;
+import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
 import com.example.awarehouse.module.warehouse.util.WarehouseConstants;
-import com.example.awarehouse.module.warehouse.util.WarehouseTestConstants;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.GroupDuplicateException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

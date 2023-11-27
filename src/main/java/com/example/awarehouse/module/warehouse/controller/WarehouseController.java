@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.example.awarehouse.util.Constants.URI_VERSION_V1;
 import static com.example.awarehouse.util.Constants.URI_WAREHOUSE;
@@ -40,7 +41,7 @@ public class WarehouseController {
     }
 
     @PostMapping("/{groupId}")
-    ResponseEntity<HttpStatus> addWarehouseToGroup(@PathVariable Long groupId, @RequestBody WarehouseIdDto warehouseIdDto){
+    ResponseEntity<HttpStatus> addWarehouseToGroup(@PathVariable UUID groupId, @RequestBody WarehouseIdDto warehouseIdDto){
         warehouseService.addWarehouseToGroup(groupId, warehouseIdDto);
         return  ResponseEntity.status(HttpStatus.OK).build();
     }

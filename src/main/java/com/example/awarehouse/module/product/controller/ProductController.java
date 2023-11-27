@@ -17,10 +17,15 @@ public class ProductController {
 
     ProductService productService;
 
-    @PostMapping(URI_PROVIDER)
-    public void createProductsFromSite(@RequestParam String warehouseName, @RequestParam String site,
+    @PostMapping(URI_PROVIDER +URI_WAREHOUSE)
+    public void createProductsForWarehouseFromSite(@RequestParam String provider,
                                       @RequestBody LinkDto urlProviderDto) throws IOException {
-        productService.createProductsFromSite(warehouseName, site, urlProviderDto);
+        productService.createProductsForWarehouseFromSite(provider, urlProviderDto);
+    }
+    @PostMapping(URI_PROVIDER + URI_GROUP)
+    public void createProductsForGroupFromSite(@RequestParam String provider,
+                                                   @RequestBody LinkDto urlProviderDto) throws IOException {
+        productService.createProductsForGroupFromSite(provider, urlProviderDto);
     }
 
     @GetMapping

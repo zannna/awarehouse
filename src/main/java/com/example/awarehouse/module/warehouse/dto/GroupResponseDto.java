@@ -1,4 +1,6 @@
 package com.example.awarehouse.module.warehouse.dto;
 
-public record GroupResponseDto(Long id, String name) {
+import java.util.UUID;
+
+public record GroupResponseDto(UUID id, String name) {
 }
