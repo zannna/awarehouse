@@ -1,5 +1,6 @@
 package com.example.awarehouse.module.worker;
 
+import com.example.awarehouse.exception.exceptions.UserNotFound;
 import com.example.awarehouse.exception.exceptions.UserUnauthorized;
 import com.example.awarehouse.module.warehouse.Role;
 import com.example.awarehouse.util.UserIdSupplier;
@@ -14,8 +15,8 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 public class WorkerService {
-    WorkerRepository workerRepository;
-
+    private final WorkerRepository workerRepository;
+    private final UserIdSupplier workerIdSupplier;
     public void register(){
         Jwt token= (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Worker worker = createWorker(token);
@@ -32,6 +33,9 @@ public class WorkerService {
         getWorkerWithConcreteRole(workerId, Role.ADMIN).orElseThrow(() -> new UserUnauthorized("User is not admin"));
     }
 
+    public Worker getWorker(){
+        return workerRepository.findById(workerIdSupplier.getUserId()).orElseThrow(() -> new UserNotFound("User is not admin"));
+    }
     private Optional<Worker> getWorkerWithConcreteRole(UUID workerID, Role role){
         return  workerRepository.findWorkerWithConcreteIdAndRole(workerID, role.toString());
     }

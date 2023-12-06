@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -15,8 +16,9 @@ import java.util.UUID;
 @Getter
 public class WarehouseGroup {
     @Id
-    @Column(name = "group_id")
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "group_id", columnDefinition = "UUID")
     private UUID id;
     private String name;
 
@@ -24,9 +26,9 @@ public class WarehouseGroup {
     @JoinColumn(name = "worker_id")
     private Worker worker;
 
-    public WarehouseGroup(UUID id, String name) {
-        this.id = id;
+    public WarehouseGroup(String name, Worker worker) {
         this.name = name;
+        this. worker =  worker;
     }
     @Override
     public boolean equals(Object o) {

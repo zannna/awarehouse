@@ -21,7 +21,7 @@ public class WarehouseGroupController {
     WarehouseGroupService groupService;
 
     @PostMapping
-    ResponseEntity<BasicGroupInfoDto> createGroup(GroupRequest group){
+    ResponseEntity<BasicGroupInfoDto> createGroup(@RequestBody GroupRequest group){
         BasicGroupInfoDto basicGroupInfoDto = groupService.createGroup(group);
         return ResponseEntity.status(HttpStatus.CREATED).body(basicGroupInfoDto);
     }

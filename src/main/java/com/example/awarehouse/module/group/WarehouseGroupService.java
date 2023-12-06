@@ -7,6 +7,8 @@ import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
 import com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.GroupDuplicateException;
 import com.example.awarehouse.module.group.mapper.WarehouseGroupMapper;
+import com.example.awarehouse.module.worker.Worker;
+import com.example.awarehouse.module.worker.WorkerService;
 import com.example.awarehouse.util.UserIdSupplier;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,12 +23,14 @@ import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.GR
 public class WarehouseGroupService {
     private final WarehouseGroupRepository warehouseGroupRepository;
     private final UserIdSupplier workerIdSupplier;
+    private final WorkerService workerService;
     private final WorkerWarehouseService workerWarehouseService;
 
     public BasicGroupInfoDto createGroup(GroupRequest groupRequest){
-        UUID workerId = workerIdSupplier.getUserId();
-        checkExistence(groupRequest.name(), workerId);
-        WarehouseGroup warehouseGroup = warehouseGroupRepository.createGroup(groupRequest.name(), workerId);
+        Worker worker = workerService.getWorker();
+        checkExistence(groupRequest.name(), worker.getId());
+        WarehouseGroup warehouseGroup = new WarehouseGroup(groupRequest.name(), worker);
+        warehouseGroupRepository.save(warehouseGroup);
         return WarehouseGroupMapper.toDto(warehouseGroup);
 
     }

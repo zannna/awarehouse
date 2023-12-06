@@ -11,6 +11,7 @@ import com.example.awarehouse.module.group.dto.GroupRequest;
 import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
 import com.example.awarehouse.module.warehouse.group.util.factory.WarehouseGroupFactory;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.GroupDuplicateException;
+import com.example.awarehouse.module.worker.WorkerService;
 import com.example.awarehouse.module.worker.util.WorkerConstants;
 import com.example.awarehouse.util.UserIdSupplier;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,7 @@ class WarehouseGroupServiceTest {
     WarehouseGroupRepository warehouseGroupRepository = mock(WarehouseGroupRepository.class);
     UserIdSupplier workerIdSupplier =  () -> WorkerConstants.WORKER_ID;
     WorkerWarehouseService workerWarehouseService = mock(WorkerWarehouseService.class);
+    WorkerService workerService = mock(WorkerService.class);
 
     @Test
     public void createGroup_whenGroupRequestIsValid_thenSaveGroup() {
@@ -40,8 +42,8 @@ class WarehouseGroupServiceTest {
         contextMock.setContext();
         GroupRequest groupRequest = new GroupRequest("toys");
         when(warehouseGroupRepository.checkIfNameExists("toys", WORKER_ID)).thenReturn(false);
-        when(warehouseGroupRepository.createGroup(any(String.class), any(UUID.class))).thenReturn(new WarehouseGroup(1L,"toys", null));
-        WarehouseGroupService warehouseGroupService = new WarehouseGroupService(warehouseGroupRepository, workerIdSupplier, workerWarehouseService);
+        when(warehouseGroupRepository.createGroup(any(String.class), any(UUID.class))).thenReturn(new WarehouseGroup(UUID.fromString("c6e1b3aa-948d-11ee-b9d1-0242ac120002"),"toys", null));
+        WarehouseGroupService warehouseGroupService = new WarehouseGroupService(warehouseGroupRepository, workerIdSupplier, workerService, workerWarehouseService);
 
         //when
         BasicGroupInfoDto basicGroupInfoDto = warehouseGroupService.createGroup(groupRequest);
@@ -60,7 +62,7 @@ class WarehouseGroupServiceTest {
         contextMock.setContext();
         GroupRequest groupRequest = new GroupRequest("toys");
         when(warehouseGroupRepository.checkIfNameExists("toys", WORKER_ID)).thenReturn(true);
-        WarehouseGroupService warehouseGroupService = new WarehouseGroupService(warehouseGroupRepository, workerIdSupplier, workerWarehouseService);
+        WarehouseGroupService warehouseGroupService = new WarehouseGroupService(warehouseGroupRepository, workerIdSupplier,  workerService, workerWarehouseService);
 
         //when-then
         assertThrows(
@@ -84,12 +86,12 @@ class WarehouseGroupServiceTest {
 
         //then
         assertThat(groupsWithWarehouses).contains(
-                entry(new BasicGroupInfoDto(1L, "Group 1"),
+                entry(new BasicGroupInfoDto(UUID.fromString("c6e1b3aa-948d-11ee-b9d1-0242ac120002"), "Group 1"),
                         List.of(new BasicWarehouseInfoDto(UUID.fromString("5d8a8b84-8227-11ee-b962-0242ac120002"),
                         "Warehouse 1"))),
-                entry(new BasicGroupInfoDto(2L, "Group 2"),
+                entry(new BasicGroupInfoDto(UUID.fromString("d985e5e4-948d-11ee-b9d1-0242ac120002"), "Group 2"),
                         List.of(new BasicWarehouseInfoDto(UUID.fromString("5d8a8b84-8227-11ee-b962-0242ac120002"), "Warehouse 1"),
                                 new BasicWarehouseInfoDto(UUID.fromString("8c6e5ac0-8227-11ee-b962-0242ac120002"), "Warehouse 3"))),
-                entry(new BasicGroupInfoDto(2L, "Group 3"), new ArrayList<>()));
+                entry(new BasicGroupInfoDto(UUID.fromString("e2802bdc-948d-11ee-b9d1-0242ac120002"), "Group 3"), new ArrayList<>()));
     }
 }

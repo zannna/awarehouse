@@ -2,12 +2,14 @@ package com.example.awarehouse.module.product;
 
 import com.example.awarehouse.module.group.WarehouseGroupRepository;
 import com.example.awarehouse.module.product.dto.LinkDto;
+import com.example.awarehouse.module.product.dto.ProductDTO;
 import com.example.awarehouse.module.product.util.exception.ProductProviderNotExistException;
 import com.example.awarehouse.util.configuration.WebDriverProvider;
 import lombok.AllArgsConstructor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -25,16 +27,16 @@ public class ProductService {
     private ProductWarehouseRepository productWarehouseRepository;
 
 
-    public void createProductsForWarehouseFromSite(String provider, LinkDto linkDto) throws IOException {
+    public PageImpl<ProductDTO> createProductsForWarehouseFromSite(String provider, LinkDto linkDto) throws IOException {
         WebDriver webDriver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), new ChromeOptions());
         ProductProvider productProvider = getProductProviderForWarehouse(webDriver, provider, linkDto.associateElementId());
-        productProvider.getProductsFromSite(linkDto.link());
+        return productProvider.getProductsFromSite(linkDto.link());
     }
 
-    public void createProductsForGroupFromSite(String provider, LinkDto linkDto) throws IOException {
+    public PageImpl<ProductDTO> createProductsForGroupFromSite(String provider, LinkDto linkDto) throws IOException {
         WebDriver webDriver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), new ChromeOptions());
         ProductProvider productProvider = getProductProviderForGroup(webDriver, provider, linkDto.associateElementId());
-        productProvider.getProductsFromSite(linkDto.link());
+        return productProvider.getProductsFromSite(linkDto.link());
     }
 
     private ProductProvider getProductProviderForWarehouse(WebDriver webDriver, String provider, UUID warehouseId) {

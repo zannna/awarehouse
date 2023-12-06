@@ -31,7 +31,7 @@ public class Product {
 
     private String photo;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "group_id")
    private WarehouseGroup group;
 

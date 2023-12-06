@@ -3,6 +3,7 @@ package com.example.awarehouse.module.worker;
 import com.example.awarehouse.module.warehouse.WorkerWarehouse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
+@Getter
 public class Worker {
 
     @Id

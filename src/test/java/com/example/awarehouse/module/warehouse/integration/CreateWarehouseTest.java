@@ -103,7 +103,7 @@ public class CreateWarehouseTest extends TestBaseConfiguration {
         keycloakUserCreation.createBasicUser(keycloak.getAuthServerUrl());
         String jwt = keycloakUserCreation.headerJwt();
          given()
-                 .pathParam("groupId", "1")
+                 .pathParam("groupId", "c6e1b3aa-948d-11ee-b9d1-0242ac120002")
                 .contentType(ContentType.JSON)
                 .header("Authorization", jwt)
                  .body(new WarehouseIdDto(WAREHOUSE_ID))
@@ -117,7 +117,7 @@ public class CreateWarehouseTest extends TestBaseConfiguration {
         Warehouse warehouse =  warehouseRepository.findById(WAREHOUSE_ID).get();
         Set<WarehouseGroup> groups = warehouse.getWarehouseGroups();
         assertThat(groups.size()).isEqualTo(1);
-        assertThat(groups).allMatch(g->g.getId()== 1);
+        assertThat(groups).allMatch(g->g.getId().equals(UUID.fromString("c6e1b3aa-948d-11ee-b9d1-0242ac120002")));
 
     }
 }
