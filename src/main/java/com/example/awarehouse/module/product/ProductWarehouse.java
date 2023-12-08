@@ -31,6 +31,12 @@ public class ProductWarehouse {
 
    private double numberOfProducts;
 
+    public ProductWarehouse(Product product, Warehouse warehouse, double numberOfProducts) {
+        this.product = product;
+        this.warehouse = warehouse;
+        this.numberOfProducts = numberOfProducts;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }

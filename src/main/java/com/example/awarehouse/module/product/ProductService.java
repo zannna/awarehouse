@@ -1,67 +1,91 @@
 package com.example.awarehouse.module.product;
 
-import com.example.awarehouse.module.group.WarehouseGroupRepository;
-import com.example.awarehouse.module.product.dto.LinkDto;
+import com.example.awarehouse.module.group.WarehouseGroup;
+import com.example.awarehouse.module.group.WarehouseGroupService;
+import com.example.awarehouse.module.product.dto.PriceDto;
+import com.example.awarehouse.module.product.dto.ProductCreationDto;
 import com.example.awarehouse.module.product.dto.ProductDTO;
-import com.example.awarehouse.module.product.util.exception.ProductProviderNotExistException;
-import com.example.awarehouse.util.configuration.WebDriverProvider;
+import com.example.awarehouse.module.product.mapper.ProductMapper;
+import com.example.awarehouse.module.warehouse.Warehouse;
+import com.example.awarehouse.module.warehouse.WarehouseService;
 import lombok.AllArgsConstructor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-
-import static com.example.awarehouse.module.product.util.ProductConstants.PRODUCT_NOT_EXIST;
 
 @Service
 @AllArgsConstructor
 public class ProductService {
-    private ProductRepository productRepository;
-    private WarehouseGroupRepository warehouseGroupRepository;
-    private ProductWarehouseRepository productWarehouseRepository;
+private ProductRepository productRepository;
+private WarehouseService warehouseService;
+private WarehouseGroupService warehouseGroupService;
 
-
-    public PageImpl<ProductDTO> createProductsForWarehouseFromSite(String provider, LinkDto linkDto) throws IOException {
-        WebDriver webDriver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), new ChromeOptions());
-        ProductProvider productProvider = getProductProviderForWarehouse(webDriver, provider, linkDto.associateElementId());
-        return productProvider.getProductsFromSite(linkDto.link());
+    public List<ProductDTO> createProduct(ProductCreationDto productDto) {
+        checkIfWarehouseIdAndGroupIdNotNull(productDto);
+        UUID groupId = productDto.getGroupId();
+        WarehouseGroup group = getGroup(groupId, productDto.getAmountGroup());
+        Price price = getPrice(productDto);
+        Product product = new Product(productDto.getTitle(), productDto.getAmountGroup(), price, productDto.getPhoto(), group);
+        Product savedProduct = productRepository.save(product);
+        UUID warehouseId = productDto.getWarehouseId();
+        List<ProductDTO> products= new ArrayList<>();
+        if(groupId != null && productDto.getAmountGroup() != productDto.getAmountWarehouse()){
+           products.add(ProductMapper.withGroupToDto(savedProduct));
+        }
+        if (warehouseId != null) {
+            ProductWarehouse productWarehouse = createProductWarehouseAssociation(savedProduct, warehouseId, productDto.getAmountWarehouse());
+            products.add(ProductMapper.withWarehouseToDto(product,productWarehouse));
+        }
+        return products;
     }
-
-    public PageImpl<ProductDTO> createProductsForGroupFromSite(String provider, LinkDto linkDto) throws IOException {
-        WebDriver webDriver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), new ChromeOptions());
-        ProductProvider productProvider = getProductProviderForGroup(webDriver, provider, linkDto.associateElementId());
-        return productProvider.getProductsFromSite(linkDto.link());
-    }
-
-    private ProductProvider getProductProviderForWarehouse(WebDriver webDriver, String provider, UUID warehouseId) {
-        if (provider.equals("WSZYSTKO_PL")) {
-            return new WszystkoPlProductProviderForWarehouse(webDriver, warehouseId, productRepository, productWarehouseRepository);
-        } else {
-            throw new ProductProviderNotExistException(PRODUCT_NOT_EXIST);
+    private void checkIfWarehouseIdAndGroupIdNotNull(ProductCreationDto productDto){
+        UUID warehouseId = productDto.getWarehouseId();
+        UUID groupId = productDto.getGroupId();
+        if(warehouseId ==null && groupId== null){
+            throw new IllegalArgumentException("WarehouseId or groupId must be provided");
+        }
+        else if(warehouseId !=null && groupId!= null && productDto.getAmountGroup() ==0 && productDto.getAmountWarehouse() ==0){
+            throw new IllegalArgumentException("WarehouseId and groupId cannot be provided at the same time");
         }
     }
 
-    private ProductProvider getProductProviderForGroup(WebDriver webDriver, String provider, UUID groupId) {
-        if (provider.equals("WSZYSTKO_PL")) {
-            return new WszystkoPlProductProviderForGroup(webDriver, groupId, warehouseGroupRepository, productRepository);
-        } else {
-            throw new ProductProviderNotExistException(PRODUCT_NOT_EXIST);
+    private ProductWarehouse createProductWarehouseAssociation(Product product, UUID warehouseId, Double amountWarehouse) {
+        if(warehouseIsSet(warehouseId, amountWarehouse)) {
+            Warehouse warehouse = warehouseService.getWarehouse(warehouseId).orElse(null);
+            ProductWarehouse productWarehouse = new ProductWarehouse(product, warehouse, amountWarehouse);
+           return productWarehouse;
         }
+        return null;
     }
 
-    public void fun() throws MalformedURLException {
-        WebDriver webDriver = WebDriverProvider.webDriver();
-        ProductProvider productProvider = new WszystkoPlProductProviderForWarehouse(webDriver, null, productRepository, productWarehouseRepository);
-        productProvider.getProductsFromSite("https://wszystko.pl/sprzedawca/drogerianikolapl");
-        webDriver.quit();
-
+    private boolean warehouseIsSet(UUID warehouseId, Double amountWarehouse){
+        if(warehouseId == null){
+            return false;
+        }
+        if (amountWarehouse == null) {
+            throw new IllegalArgumentException("AmountWarehouse must be provided");
+        }
+        return true;
     }
+
+    private WarehouseGroup getGroup(UUID groupId, Double amountGroup) {
+        if(groupId==null){
+            return null;
+        }
+        if (groupId != null && amountGroup == null) {
+            throw new IllegalArgumentException("AmountGroup must be provided");
+        }
+        return warehouseGroupService.getGroup(groupId).orElse(null);
+    }
+
+    private Price getPrice(ProductCreationDto productDto){
+        PriceDto priceDto = productDto.getPrice();
+       return new Price(priceDto.getAmount(), priceDto.getCurrency());
+    }
+
 }
 
 

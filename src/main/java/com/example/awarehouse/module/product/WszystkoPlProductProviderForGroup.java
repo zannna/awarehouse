@@ -29,7 +29,7 @@ public class WszystkoPlProductProviderForGroup extends WszystkoPlProductProvider
        WarehouseGroup group = warehouseGroupRepository.findById(associateElementId).get();
        product.setGroup(group);
        product= productRepository.save(product);
-        ProductDTO productDTO = ProductMapper.mapToDto(product);
+        ProductDTO productDTO = ProductMapper.withGroupToDto(product);
        addedProducts.add(productDTO);
     }
 }

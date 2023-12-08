@@ -1,6 +1,7 @@
 package com.example.awarehouse.module.warehouse;
 
 import com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto;
+import com.example.awarehouse.module.warehouse.util.exception.exceptions.WorkerWarehouseRelationNotExist;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,5 +25,12 @@ public class WorkerWarehouseService {
     }
     public Set<Warehouse> getWorkerWarehouses(UUID workerId){
         return workerWarehouseRepository.findWorkerWarehouses(workerId);
+    }
+    public void validateWorkerWarehouseRelation(UUID workerId, UUID warehouseId){
+        boolean isWorkerWarehouseRelationExist = workerWarehouseRepository.findByWarehouseIdAndWorkerId(warehouseId, workerId).isPresent();
+        if(!isWorkerWarehouseRelationExist){
+            throw new WorkerWarehouseRelationNotExist("Worker with id "+workerId+" does not have relation with warehouse with id "+warehouseId);
+        }
+
     }
 }

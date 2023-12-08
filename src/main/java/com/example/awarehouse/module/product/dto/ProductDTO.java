@@ -18,11 +18,11 @@ public class ProductDTO {
     private UUID id;
     private String title;
     private double amount;
-    private Price price;
+    private PriceDto price;
     private String photo;
 
     private BasicGroupInfoDto group;
-    private Set<BasicWarehouseInfoDto> productWarehouses;
+    private BasicWarehouseInfoDto productWarehouses;
 
 
 }
