@@ -1,5 +1,6 @@
 package com.example.awarehouse.module.warehouse.shelve.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,13 +11,11 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 public class ShelveCreationDto {
+    @NotNull(message = "Number is mandatory")
     private int number;
     private String name;
     boolean size;
-    private double height;
-    private double width;
-    private double length;
-    private int numberOfTiers;
+    private DimensionsDto dimensions;
     private boolean sameSizeTiers;
     private List<ShelveTierCreationDto> tiers;
 }
