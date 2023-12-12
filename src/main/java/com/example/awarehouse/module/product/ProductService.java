@@ -2,19 +2,24 @@ package com.example.awarehouse.module.product;
 
 import com.example.awarehouse.module.group.WarehouseGroup;
 import com.example.awarehouse.module.group.WarehouseGroupService;
-import com.example.awarehouse.module.product.dto.PriceDto;
-import com.example.awarehouse.module.product.dto.ProductCreationDto;
-import com.example.awarehouse.module.product.dto.ProductDTO;
+import com.example.awarehouse.module.product.dto.*;
 import com.example.awarehouse.module.product.mapper.ProductMapper;
+import com.example.awarehouse.module.product.mapper.ProductWarehouseMapper;
 import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.WarehouseService;
+import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
+import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
+import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import java.util.UUID;
+
+import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.WAREHOUSE_NOT_EXIST;
 
 @Service
 @AllArgsConstructor
@@ -22,53 +27,31 @@ public class ProductService {
 private ProductRepository productRepository;
 private WarehouseService warehouseService;
 private WarehouseGroupService warehouseGroupService;
+private ShelveTierService tierService;
+private ProductWarehouseRepository productWarehouseRepository;
 
-    public List<ProductDTO> createProduct(ProductCreationDto productDto) {
-        checkIfWarehouseIdAndGroupIdNotNull(productDto);
-        UUID groupId = productDto.getGroupId();
-        WarehouseGroup group = getGroup(groupId, productDto.getAmountGroup());
-        Price price = getPrice(productDto);
-        Product product = new Product(productDto.getTitle(), productDto.getAmountGroup(), price, productDto.getPhoto(), group);
-        Product savedProduct = productRepository.save(product);
-        UUID warehouseId = productDto.getWarehouseId();
-        List<ProductDTO> products= new ArrayList<>();
-        if(groupId != null && productDto.getAmountGroup() != productDto.getAmountWarehouse()){
-           products.add(ProductMapper.withGroupToDto(savedProduct));
-        }
-        if (warehouseId != null) {
-            ProductWarehouse productWarehouse = createProductWarehouseAssociation(savedProduct, warehouseId, productDto.getAmountWarehouse());
-            products.add(ProductMapper.withWarehouseToDto(product,productWarehouse));
-        }
-        return products;
+    @Transactional
+    public ProductDto createProduct(ProductCreationDto productDto) {
+        Product savedProduct = product(productDto);
+        List<ProductWarehouseDto> productWarehouses = createProductWarehouseAssociations(savedProduct, productDto.getProductWarehouses());
+        setGroupAmountIfNotExist(savedProduct, productWarehouses);
+        return ProductMapper.toDto(savedProduct, productWarehouses);
     }
+private Product product(ProductCreationDto productDto) {
+    checkIfWarehouseIdAndGroupIdNotNull(productDto);
+    UUID groupId = productDto.getGroupId();
+    WarehouseGroup group = getGroup(groupId, productDto.getAmountGroup());
+    Price price = getPrice(productDto);
+    Product product = new Product(productDto.getTitle(), productDto.getAmountGroup(), price, productDto.getPhoto(), group);
+    Product savedProduct = productRepository.save(product);
+    return savedProduct;
+}
     private void checkIfWarehouseIdAndGroupIdNotNull(ProductCreationDto productDto){
-        UUID warehouseId = productDto.getWarehouseId();
+       int productWarehouseSize = productDto.getProductWarehouses().size();
         UUID groupId = productDto.getGroupId();
-        if(warehouseId ==null && groupId== null){
+        if(productWarehouseSize ==0 && groupId== null){
             throw new IllegalArgumentException("WarehouseId or groupId must be provided");
         }
-        else if(warehouseId !=null && groupId!= null && productDto.getAmountGroup() ==0 && productDto.getAmountWarehouse() ==0){
-            throw new IllegalArgumentException("WarehouseId and groupId cannot be provided at the same time");
-        }
-    }
-
-    private ProductWarehouse createProductWarehouseAssociation(Product product, UUID warehouseId, Double amountWarehouse) {
-        if(warehouseIsSet(warehouseId, amountWarehouse)) {
-            Warehouse warehouse = warehouseService.getWarehouse(warehouseId).orElse(null);
-            ProductWarehouse productWarehouse = new ProductWarehouse(product, warehouse, amountWarehouse);
-           return productWarehouse;
-        }
-        return null;
-    }
-
-    private boolean warehouseIsSet(UUID warehouseId, Double amountWarehouse){
-        if(warehouseId == null){
-            return false;
-        }
-        if (amountWarehouse == null) {
-            throw new IllegalArgumentException("AmountWarehouse must be provided");
-        }
-        return true;
     }
 
     private WarehouseGroup getGroup(UUID groupId, Double amountGroup) {
@@ -83,7 +66,45 @@ private WarehouseGroupService warehouseGroupService;
 
     private Price getPrice(ProductCreationDto productDto){
         PriceDto priceDto = productDto.getPrice();
-       return new Price(priceDto.getAmount(), priceDto.getCurrency());
+        return new Price(priceDto.getAmount(), priceDto.getCurrency());
+    }
+
+    private List<ProductWarehouseDto> createProductWarehouseAssociations(Product savedProduct, List<ProductWarehouseCreationDto> providedProductWarehouses){
+        List<ProductWarehouseDto> productWarehouses= new ArrayList<>();
+        for (ProductWarehouseCreationDto productWarehouseCreationDto :
+                providedProductWarehouses) {
+            ProductWarehouse productWarehouse = createProductWarehouseAssociation(productWarehouseCreationDto, savedProduct);
+            productWarehouses.add(ProductWarehouseMapper.toDto(productWarehouse));
+        }
+        return productWarehouses;
+    }
+    private ProductWarehouse createProductWarehouseAssociation(ProductWarehouseCreationDto productWarehouseCreationDto, Product product) {
+        UUID warehouseId = productWarehouseCreationDto.warehouseId();
+        Warehouse warehouse = warehouseService.getWarehouse(warehouseId).orElseThrow(()-> new WarehouseNotExistException(WAREHOUSE_NOT_EXIST));
+        Optional<ShelveTier> tier = Optional.empty();
+        if(shelveProvided(productWarehouseCreationDto)) {
+            tier = Optional.of(tierService.getShelveTier(warehouseId, productWarehouseCreationDto.shelveNumber(), productWarehouseCreationDto.tierNumber()));
+        }
+        ProductWarehouse productWarehouse = new ProductWarehouse(product, warehouse,  productWarehouseCreationDto.amount(), tier);
+        productWarehouseRepository.save(productWarehouse);
+        return productWarehouse;
+    }
+
+    private boolean shelveProvided(ProductWarehouseCreationDto productWarehouseCreationDto) {
+        if(productWarehouseCreationDto.shelveNumber() != null && productWarehouseCreationDto.tierNumber() != null){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    private void setGroupAmountIfNotExist(Product savedProduct, List<ProductWarehouseDto> productWarehouses){
+        if(savedProduct.getAmount()!=0){
+            Double amount = productWarehouses.stream().mapToDouble(ProductWarehouseDto::amount).sum();
+            savedProduct.setAmount(amount);
+        }
+
     }
 
 }

@@ -2,7 +2,7 @@ package com.example.awarehouse.module.product;
 
 import com.example.awarehouse.module.group.WarehouseGroupRepository;
 import com.example.awarehouse.module.product.dto.LinkDto;
-import com.example.awarehouse.module.product.dto.ProductDTO;
+import com.example.awarehouse.module.product.dto.ProductDto;
 import com.example.awarehouse.module.product.util.exception.ProductProviderNotExistException;
 import com.example.awarehouse.module.warehouse.WarehouseService;
 import lombok.AllArgsConstructor;
@@ -26,13 +26,13 @@ public class ProductProviderService {
     private WarehouseService warehouseService;
 
 
-    public PageImpl<ProductDTO> createProductsForWarehouseFromSite(String provider, LinkDto linkDto) throws IOException {
+    public PageImpl<ProductDto> createProductsForWarehouseFromSite(String provider, LinkDto linkDto) throws IOException {
         WebDriver webDriver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), new ChromeOptions());
         ProductProvider productProvider = getProductProviderForWarehouse(webDriver, provider, linkDto.associateElementId());
         return productProvider.getProductsFromSite(linkDto.link());
     }
 
-    public PageImpl<ProductDTO> createProductsForGroupFromSite(String provider, LinkDto linkDto) throws IOException {
+    public PageImpl<ProductDto> createProductsForGroupFromSite(String provider, LinkDto linkDto) throws IOException {
         WebDriver webDriver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), new ChromeOptions());
         ProductProvider productProvider = getProductProviderForGroup(webDriver, provider, linkDto.associateElementId());
         return productProvider.getProductsFromSite(linkDto.link());

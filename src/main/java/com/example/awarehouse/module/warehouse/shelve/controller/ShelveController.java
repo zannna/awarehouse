@@ -1,9 +1,5 @@
 package com.example.awarehouse.module.warehouse.shelve.controller;
 
-import com.example.awarehouse.module.product.dto.ProductCreationDto;
-import com.example.awarehouse.module.product.dto.ProductDTO;
-import com.example.awarehouse.module.warehouse.Warehouse;
-import com.example.awarehouse.module.warehouse.WarehouseService;
 import com.example.awarehouse.module.warehouse.shelve.ShelveService;
 import com.example.awarehouse.module.warehouse.shelve.dto.ShelveCreationDto;
 import com.example.awarehouse.module.warehouse.shelve.dto.ShelveDto;
@@ -12,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 import static com.example.awarehouse.util.Constants.*;

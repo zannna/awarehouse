@@ -34,9 +34,6 @@ class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken> {
         return new JwtAuthenticationToken(jwt, authorities);
     }
 
-//    private String getPrincipleClaimName(Jwt jwt) {
-//        return jwt.getClaim(JwtClaimNames.SUB);
-//    }
 
     private Collection<? extends GrantedAuthority> extractResourceRoles(Jwt jwt) {
         Map<String, Object> resourceAccess;

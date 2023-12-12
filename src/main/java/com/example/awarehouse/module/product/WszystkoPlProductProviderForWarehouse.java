@@ -1,9 +1,9 @@
 package com.example.awarehouse.module.product;
 
-import com.example.awarehouse.module.product.dto.ProductDTO;
+import com.example.awarehouse.module.product.dto.ProductDto;
 import com.example.awarehouse.module.product.mapper.ProductMapper;
+import com.example.awarehouse.module.product.mapper.ProductWarehouseMapper;
 import com.example.awarehouse.module.warehouse.Warehouse;
-import com.example.awarehouse.module.warehouse.WarehouseRepository;
 import com.example.awarehouse.module.warehouse.WarehouseService;
 import org.openqa.selenium.WebDriver;
 
@@ -28,7 +28,7 @@ public class WszystkoPlProductProviderForWarehouse extends WszystkoPlProductProv
         product= productRepository.save(product);
         ProductWarehouse productWarehouse = new ProductWarehouse(product, warehouse, product.getAmount());
         product.setProductWarehouses(Set.of(productWarehouse));
-        ProductDTO productDTO = ProductMapper.withWarehouseToDto(product, productWarehouse);
+        ProductDto productDTO = ProductMapper.toDto(product, List.of(ProductWarehouseMapper.toDto(productWarehouse)));
         addedProducts.add(productDTO);
     }
 }

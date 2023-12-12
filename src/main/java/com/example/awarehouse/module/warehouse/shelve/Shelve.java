@@ -34,8 +34,8 @@ public class Shelve {
     @Column(name = "same_size_tier")
     private boolean sameSizeTiers;
 
-    @OneToMany(mappedBy="shelve", cascade = CascadeType.PERSIST)
-    private Set<ShelveTier> shelveTiers = new HashSet<>();
+    @OneToMany(mappedBy="shelve", cascade = CascadeType.ALL)
+    private Set<ShelveTier> shelveTiers;
 
     @ManyToOne
     @JoinColumn(name = "warehouse_id", nullable = false)

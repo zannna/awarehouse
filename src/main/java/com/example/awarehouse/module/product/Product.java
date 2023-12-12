@@ -1,6 +1,7 @@
 package com.example.awarehouse.module.product;
 
 import com.example.awarehouse.module.group.WarehouseGroup;
+import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,7 +38,7 @@ public class Product {
    private WarehouseGroup group;
 
    @OneToMany(mappedBy = "product")
-   private Set<ProductWarehouse> productWarehouses= new HashSet<>();
+   private Set<ProductWarehouse> productWarehouses = new HashSet<>();
 
     public Product(String title, double amount, Price price, String photo, WarehouseGroup group) {
         this.title = title;

@@ -1,6 +1,5 @@
 package com.example.awarehouse.module.product;
 
-import com.example.awarehouse.module.warehouse.WorkerWarehouse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
