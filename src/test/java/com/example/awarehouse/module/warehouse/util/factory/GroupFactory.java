@@ -7,11 +7,12 @@ import com.example.awarehouse.module.warehouse.mapper.GroupMapper;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 public class GroupFactory {
 
     public static Set<WarehouseGroup> createListOfGroups(){
-        return Set.of(new WarehouseGroup(1L, "clothes"), new WarehouseGroup(2L,"toys"));
+        return Set.of(new WarehouseGroup(UUID.fromString("c3069688-9a91-11ee-b9d1-0242ac120002"), "clothes", null), new WarehouseGroup(UUID.fromString("c4158a86-9a94-11ee-b9d1-0242ac120002"),"toys", null));
     }
     public  static Set<WarehouseGroup> createSetOfGroups(){
         return createListOfGroups().stream().collect(java.util.stream.Collectors.toSet());

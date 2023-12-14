@@ -1,6 +1,7 @@
 package com.example.awarehouse.module.warehouse;
 
 import com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto;
+import com.example.awarehouse.module.warehouse.dto.GroupWarehouseDto;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WorkerWarehouseRelationNotExist;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,5 +33,9 @@ public class WorkerWarehouseService {
             throw new WorkerWarehouseRelationNotExist("Worker with id "+workerId+" does not have relation with warehouse with id "+warehouseId);
         }
 
+    }
+
+    public List<GroupWarehouseDto> getWarehouseGroups(UUID warehouseId, UUID workerId){
+        return   workerWarehouseRepository.findWorkerWarehousesWithGroups(warehouseId, workerId);
     }
 }

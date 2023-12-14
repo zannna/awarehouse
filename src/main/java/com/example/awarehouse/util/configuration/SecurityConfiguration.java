@@ -32,7 +32,7 @@ class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(requests ->
                 requests
-                        .requestMatchers(URI_VERSION_V1+"/**").authenticated()
+                        .requestMatchers(URI_VERSION_V1+"/**").permitAll()
         );
 
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter)));

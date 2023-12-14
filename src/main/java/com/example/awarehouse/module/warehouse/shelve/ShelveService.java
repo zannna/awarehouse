@@ -1,23 +1,23 @@
 package com.example.awarehouse.module.warehouse.shelve;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import com.example.awarehouse.module.product.dto.ProductCreationDto;
-import com.example.awarehouse.module.product.dto.ProductDTO;
 import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.WarehouseService;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
-import com.example.awarehouse.module.warehouse.shelve.dto.DimensionsDto;
-import com.example.awarehouse.module.warehouse.shelve.dto.ShelveCreationDto;
-import com.example.awarehouse.module.warehouse.shelve.dto.ShelveDto;
-import com.example.awarehouse.module.warehouse.shelve.dto.ShelveTierCreationDto;
+import com.example.awarehouse.module.warehouse.shelve.dto.*;
 import com.example.awarehouse.module.warehouse.shelve.mapper.ShelveMapper;
+import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
+import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
+import com.example.awarehouse.module.warehouse.util.exception.exceptions.ShelveNotExist;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
 import com.example.awarehouse.util.UserIdSupplier;
+import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -27,6 +27,8 @@ public class ShelveService {
     private final ShelveRepository shelveRepository;
     private final WorkerWarehouseService workerWarehouseService;
     private final UserIdSupplier workerIdSupplier;
+    private final ShelveTierService shelveTierService;
+
     public ShelveDto createShelve(UUID warehouseId, ShelveCreationDto shelveDto) {
         workerWarehouseService.validateWorkerWarehouseRelation(  workerIdSupplier.getUserId(), warehouseId);
         validateIfShelveNumberNotExistInWarehouse(warehouseId,shelveDto.getNumber());
@@ -35,6 +37,7 @@ public class ShelveService {
         Warehouse warehouse=warehouseService.getWarehouse(warehouseId).orElseThrow(()->new WarehouseNotExistException("Warehouse with id "+warehouseId+" does not exist"));
         Shelve shelve= ShelveMapper.toShelve(shelveDto, warehouse);
         Shelve savedShelve = shelveRepository.save(shelve);
+        setTiers(savedShelve);
         return ShelveMapper.toShelveDto(savedShelve);
     }
 
@@ -62,5 +65,13 @@ public class ShelveService {
                 .filter(ShelveTierCreationDto::isSize)
                 .forEach(tier -> checkDimension(tier.getDimensions()));
 
-        }
+    }
+
+    private void setTiers(Shelve savedShelve){
+        Set<ShelveTier> tiers =  savedShelve.getShelveTiers();
+        tiers.forEach(tier -> tier.setShelve(savedShelve));
+        shelveTierService.saveAllShelves(tiers);
+    }
+
+
 }

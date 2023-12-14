@@ -35,4 +35,8 @@ public class ShelveTier {
         this.size = size;
         this.dimensions = dimensions;
     }
+
+    public void setShelve(Shelve shelve) {
+        this.shelve = shelve;
+    }
 }

@@ -1,6 +1,6 @@
 package com.example.awarehouse.module.product;
 
-import com.example.awarehouse.module.product.dto.ProductDTO;
+import com.example.awarehouse.module.product.dto.ProductDto;
 import com.example.awarehouse.module.product.util.CurrencyProvider;
 import lombok.AllArgsConstructor;
 import org.jsoup.Jsoup;
@@ -29,7 +29,7 @@ public abstract class WszystkoPlProductProvider implements ProductProvider {
 
     protected UUID associateElementId;
 
-    protected List<ProductDTO> addedProducts = new ArrayList<>();
+    protected List<ProductDto> addedProducts = new ArrayList<>();
 
     public WszystkoPlProductProvider(WebDriver driver, UUID associateElementId) {
         this.driver = driver;
@@ -37,7 +37,7 @@ public abstract class WszystkoPlProductProvider implements ProductProvider {
     }
 
     @Override
-    public PageImpl<ProductDTO> getProductsFromSite(String link) {
+    public PageImpl<ProductDto> getProductsFromSite(String link) {
         try {
             Document firstDocument = processFirstPage(link);
             int lastPage = getLastPage(firstDocument);

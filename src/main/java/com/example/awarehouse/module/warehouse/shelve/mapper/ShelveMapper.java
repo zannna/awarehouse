@@ -1,6 +1,5 @@
 package com.example.awarehouse.module.warehouse.shelve.mapper;
 
-import com.example.awarehouse.module.product.dto.ProductDTO;
 import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.shelve.Dimensions;
 import com.example.awarehouse.module.warehouse.shelve.Shelve;
@@ -10,7 +9,6 @@ import com.example.awarehouse.module.warehouse.shelve.dto.ShelveDto;
 import com.example.awarehouse.module.warehouse.shelve.dto.ShelveTierDto;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 
-import java.util.List;
 import java.util.Set;
 
 public class ShelveMapper {

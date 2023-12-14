@@ -4,13 +4,12 @@ import com.example.awarehouse.module.product.ProductProviderService;
 import com.example.awarehouse.module.product.ProductService;
 import com.example.awarehouse.module.product.dto.LinkDto;
 import com.example.awarehouse.module.product.dto.ProductCreationDto;
-import com.example.awarehouse.module.product.dto.ProductDTO;
+import com.example.awarehouse.module.product.dto.ProductDto;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 
 import static com.example.awarehouse.util.Constants.*;
@@ -24,17 +23,17 @@ public class ProductController {
     ProductService productService;
 
     @PostMapping(URI_WAREHOUSE)
-    public PageImpl<ProductDTO> createProductsForWarehouseFromSite(@RequestParam String provider,
+    public PageImpl<ProductDto> createProductsForWarehouseFromSite(@RequestParam String provider,
                                                                    @RequestBody LinkDto urlProviderDto) throws IOException {
         return productProviderService.createProductsForWarehouseFromSite(provider, urlProviderDto);
     }
     @PostMapping(URI_GROUP)
-    public PageImpl<ProductDTO> createProductsForGroupFromSite(@RequestParam String provider,
+    public PageImpl<ProductDto> createProductsForGroupFromSite(@RequestParam String provider,
                                                                @RequestBody LinkDto urlProviderDto) throws IOException {
         return productProviderService.createProductsForGroupFromSite(provider, urlProviderDto);
     }
     @PostMapping
-    public List<ProductDTO> createProduct(@RequestBody ProductCreationDto productDto) {
+    public ProductDto createProduct(@RequestBody ProductCreationDto productDto) {
         return productService.createProduct(productDto);
     }
 
