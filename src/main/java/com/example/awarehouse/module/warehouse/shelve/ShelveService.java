@@ -8,6 +8,7 @@ import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
 import com.example.awarehouse.module.warehouse.shelve.dto.*;
 import com.example.awarehouse.module.warehouse.shelve.mapper.ShelveMapper;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
+import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.ShelveNotExist;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
 import com.example.awarehouse.util.UserIdSupplier;
@@ -16,6 +17,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -25,7 +27,7 @@ public class ShelveService {
     private final ShelveRepository shelveRepository;
     private final WorkerWarehouseService workerWarehouseService;
     private final UserIdSupplier workerIdSupplier;
-    private EntityManager entityManager;
+    private final ShelveTierService shelveTierService;
 
     public ShelveDto createShelve(UUID warehouseId, ShelveCreationDto shelveDto) {
         workerWarehouseService.validateWorkerWarehouseRelation(  workerIdSupplier.getUserId(), warehouseId);
@@ -35,8 +37,7 @@ public class ShelveService {
         Warehouse warehouse=warehouseService.getWarehouse(warehouseId).orElseThrow(()->new WarehouseNotExistException("Warehouse with id "+warehouseId+" does not exist"));
         Shelve shelve= ShelveMapper.toShelve(shelveDto, warehouse);
         Shelve savedShelve = shelveRepository.save(shelve);
-        savedShelve.getShelveTiers().forEach(tier -> tier.setShelve(savedShelve));
-        entityManager.flush();
+        setTiers(savedShelve);
         return ShelveMapper.toShelveDto(savedShelve);
     }
 
@@ -64,6 +65,12 @@ public class ShelveService {
                 .filter(ShelveTierCreationDto::isSize)
                 .forEach(tier -> checkDimension(tier.getDimensions()));
 
+    }
+
+    private void setTiers(Shelve savedShelve){
+        Set<ShelveTier> tiers =  savedShelve.getShelveTiers();
+        tiers.forEach(tier -> tier.setShelve(savedShelve));
+        shelveTierService.saveAllShelves(tiers);
     }
 
 
