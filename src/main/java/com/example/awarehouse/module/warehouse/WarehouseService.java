@@ -1,5 +1,6 @@
 package com.example.awarehouse.module.warehouse;
 
+import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
 import com.example.awarehouse.module.warehouse.dto.*;
 import com.example.awarehouse.module.group.WarehouseGroup;
 import com.example.awarehouse.module.group.WarehouseGroupService;
@@ -7,6 +8,7 @@ import com.example.awarehouse.module.warehouse.mapper.WarehouseMapper;
 import com.example.awarehouse.module.token.SharingTokenService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.GroupNotExistException;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
+import com.example.awarehouse.util.UserIdSupplier;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.GROUP_NOT_EXIST;
 import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.WAREHOUSE_NOT_EXIST;
@@ -27,7 +30,7 @@ public class WarehouseService {
     private final WarehouseRepository warehouseRepository;
     private final WarehouseGroupService groupService;
     private final Validator validator;
-
+    private final UserIdSupplier workerIdSupplier;
 
     public void updateWarehouse(WarehouseRequest warehouseRequest) {
         //  warehouseRepository.updateWarehous()
@@ -74,4 +77,9 @@ public class WarehouseService {
         return warehouseRepository.findById(warehouseId);
     }
 
+    public Map<BasicGroupInfoDto, Set<BasicWarehouseInfoDto>> getGroupsAssociatedWithWarehouse(UUID warehouseId){
+        List<GroupWarehouseDto> groupWarehouseDtos= workerWarehouseService.getWarehouseGroups(warehouseId, workerIdSupplier.getUserId());
+        Map<BasicGroupInfoDto, Set<BasicWarehouseInfoDto>> groupWithWarehouses = groupWarehouseDtos.stream().collect(Collectors.groupingBy(GroupWarehouseDto::basicGroupInfoDto,  Collectors.mapping(GroupWarehouseDto::basicWarehouseInfoDtos, Collectors.toSet())));
+        return groupWithWarehouses;
+    }
 }

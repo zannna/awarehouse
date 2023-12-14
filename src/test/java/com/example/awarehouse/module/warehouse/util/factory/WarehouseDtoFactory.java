@@ -5,13 +5,14 @@ import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.dto.WarehouseCreation;
 
 import java.util.Set;
+import java.util.UUID;
 
 import static com.example.awarehouse.module.warehouse.util.factory.GroupFactory.createSetOfGroups;
 
 public class WarehouseDtoFactory {
 
     public static WarehouseCreation createWarehouseCreation() {
-        return new WarehouseCreation("name",  LengthUnit.METER, 3, Set.of(1L, 2L));
+        return new WarehouseCreation("name",  LengthUnit.METER, 3, Set.of(UUID.fromString(""), UUID.fromString("")));
     }
 
 

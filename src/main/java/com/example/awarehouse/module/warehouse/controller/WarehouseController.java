@@ -1,5 +1,6 @@
 package com.example.awarehouse.module.warehouse.controller;
 
+import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
 import com.example.awarehouse.module.warehouse.WarehouseService;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseRepository;
 import com.example.awarehouse.module.warehouse.dto.*;
@@ -10,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.example.awarehouse.util.Constants.URI_VERSION_V1;
@@ -46,10 +49,9 @@ public class WarehouseController {
         return  ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PostMapping("/a")
-    public ResponseEntity<List<GroupWarehouseDto>> get(){
-        List<GroupWarehouseDto> w = workerWarehouseRepository.findWorkerWarehousesWithGroups(UUID.fromString("9779029d-c19c-489e-b9f9-fe4b5bb343df"),
-                UUID.fromString("d16f795b-3a64-4ce1-9b87-91a8851d5c60"));
-        return ResponseEntity.status(HttpStatus.OK).body(w);
+    @PostMapping("/{warehouseId}/group")
+    public ResponseEntity<Map<BasicGroupInfoDto, Set<BasicWarehouseInfoDto>>> getGroupsAssociatedWithWarehouse(@PathVariable UUID warehouseId){
+        Map<BasicGroupInfoDto, Set<BasicWarehouseInfoDto>> groupWithWarehouses = warehouseService.getGroupsAssociatedWithWarehouse(warehouseId);
+        return ResponseEntity.status(HttpStatus.OK).body(groupWithWarehouses);
     }
 }
