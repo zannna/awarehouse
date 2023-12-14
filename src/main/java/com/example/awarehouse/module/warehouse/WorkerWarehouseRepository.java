@@ -1,6 +1,7 @@
 package com.example.awarehouse.module.warehouse;
 
 import com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto;
+import com.example.awarehouse.module.warehouse.dto.GroupWarehouseDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -24,8 +25,11 @@ public interface WorkerWarehouseRepository extends JpaRepository<WorkerWarehouse
     @Query("select distinct ww.warehouse from WorkerWarehouse ww where ww.worker.id =:workerId ")
     Set<Warehouse> findWorkerWarehouses(UUID workerId);
 
-    @Query("select ww.warehouse from WorkerWarehouse ww " +
-            "join ww.warehouse.warehouseGroups g" +
-            "where g in (select warehouse.warehouseGroups ")
-    Set<Warehouse> findWarehouseGroups(UUID workerId);
+    @Query("SELECT  new com.example.awarehouse.module.warehouse.dto.GroupWarehouseDto(new com.example.awarehouse.module.group.dto.BasicGroupInfoDto(wg.id, wg.name), new com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto(ww.warehouse.id, ww.warehouse.name))" +
+            " FROM WorkerWarehouse ww " +
+            "JOIN ww.warehouse.warehouseGroups wg " +
+            "WHERE wg IN (SELECT wg FROM WorkerWarehouse ww WHERE ww.warehouse.id = :warehouseId) " +
+            "AND ww.worker.id = :workerId")
+     List<GroupWarehouseDto> findWorkerWarehousesWithGroups(UUID warehouseId, UUID workerId);
+
 }
