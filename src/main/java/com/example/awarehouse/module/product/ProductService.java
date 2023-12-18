@@ -7,17 +7,18 @@ import com.example.awarehouse.module.product.mapper.ProductMapper;
 import com.example.awarehouse.module.product.mapper.ProductWarehouseMapper;
 import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.WarehouseService;
+import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import org.springframework.data.domain.Pageable;
+
+import java.util.*;
 
 import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.WAREHOUSE_NOT_EXIST;
 
@@ -29,6 +30,7 @@ private WarehouseService warehouseService;
 private WarehouseGroupService warehouseGroupService;
 private ShelveTierService tierService;
 private ProductWarehouseRepository productWarehouseRepository;
+private WorkerWarehouseService workerWarehouseService;
 
     @Transactional
     public ProductDto createProduct(ProductCreationDto productDto) {
@@ -95,6 +97,7 @@ private Product product(ProductCreationDto productDto) {
             return true;
         }
         else {
+
             return false;
         }
     }
@@ -107,7 +110,49 @@ private Product product(ProductCreationDto productDto) {
 
     }
 
+    public Page<ProductDto> getProductsFromWarehouse(UUID warehouseId, Pageable pageable) {
+        workerWarehouseService.validateWorkerWarehouseRelation(warehouseId);
+        Page<ProductDto> products = productWarehouseRepository.getAllProductsByWarehouseId(pageable, warehouseId).map(ProductMapper::toDto);
+        return products;
+    }
+
+    public List<ProductDto> getProductsFromWarehouses(List<UUID> warehouseIds, Pageable pageable) {
+        workerWarehouseService.validateWorkerWarehouseRelation(warehouseIds);
+        List<ProductWarehouse> productsPage = productWarehouseRepository. getAllProductsFromWarehouses(pageable, warehouseIds);
+        List<ProductDto> products = convertToProductDtoList(productsPage);
+        return products;
+    }
+
+    private List<ProductDto> convertToProductDtoList(List<ProductWarehouse> productsPage) {
+        Iterator<ProductWarehouse> iterator = productsPage.iterator();
+        List<ProductDto> products = new ArrayList<>();
+        while (!productsPage.isEmpty()) {
+            ProductWarehouse productWarehouse = iterator.next();
+            ProductDto product = ProductMapper.toDto(productWarehouse);
+            products.add(product);
+            iterator.remove();
+            findOtherProductWarehouses(iterator, product, products);
+            iterator = productsPage.iterator();
+        }
+        return products;
+    }
+
+    private void findOtherProductWarehouses(Iterator<ProductWarehouse> iterator, ProductDto productDto, List<ProductDto> products) {
+        while (iterator.hasNext()) {
+            ProductWarehouse next = iterator.next();
+            if (next.getProduct().getId().equals(productDto.getId())) {
+                productDto.getProductWarehouses().add(ProductWarehouseMapper.toDto(next));
+                iterator.remove();
+            }
+        }
+    }
+
+    public List<Product> findProductUnderstockByGroupId(UUID groupId) {
+        return productRepository.findUnderstockByGroup(groupId);
+    }
+
+    public List<Product> findProductUnderstockByWarehouseId(UUID warehouseId) {
+        return productWarehouseRepository.findUnderstockByWarehouse(warehouseId);
+    }
 }
-
-
 

@@ -3,6 +3,7 @@ package com.example.awarehouse.module.warehouse.shelve.dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,7 +14,7 @@ public class ShelveDto {
     private int number;
     private String name;
     private boolean size;
-    private boolean sameSizeTiers;
     private DimensionsDto dimensions;
-    private Set<ShelveTierDto> shelveTiers;
+    private List<ShelveTierDto> shelveTiers;
+    private boolean hasFreeSpace;
 }

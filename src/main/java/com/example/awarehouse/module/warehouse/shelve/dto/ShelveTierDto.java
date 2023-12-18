@@ -13,4 +13,5 @@ public class ShelveTierDto {
     private String name;
     boolean size;
     private DimensionsDto dimensions;
+    private  double fillPercentage;
 }

@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.example.awarehouse.util.Constants.*;
@@ -22,4 +23,10 @@ public class ShelveController {
     public ResponseEntity<ShelveDto> createShelve(@PathVariable UUID warehouseId, @RequestBody ShelveCreationDto shelveDto) {
         return ResponseEntity.status(HttpStatus.OK).body(shelveService.createShelve(warehouseId, shelveDto));
     }
+
+    @GetMapping
+    public ResponseEntity<List<ShelveDto>> getWarehouseInventory(@PathVariable UUID warehouseId) {
+        return ResponseEntity.status(HttpStatus.OK).body(shelveService.getShelves(warehouseId));
+    }
+
 }
