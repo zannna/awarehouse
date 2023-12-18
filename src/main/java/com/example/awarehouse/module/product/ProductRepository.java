@@ -3,10 +3,12 @@ package com.example.awarehouse.module.product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
 interface ProductRepository extends JpaRepository< Product, UUID> {
+    List<Product> findByGroupId(UUID uuid);
 //    @Modifying
 //    @Query(nativeQuery = true, value = "INSERT INTO product (:title, :amount, :price_amount, :price_currency)\n" +
 //            "SELECT  title, amount, price_amount, price_currency\n" +

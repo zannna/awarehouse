@@ -92,17 +92,21 @@ class WarehouseServiceTest {
         contextMock.setContext();
         BasicGroupInfoDto group1 = new BasicGroupInfoDto(UUID.fromString("4a50b7ce-9a90-11ee-b9d1-0242ac120002"), "group 1");
         BasicGroupInfoDto group2 = new BasicGroupInfoDto(UUID.fromString("7c1a4bc6-9a90-11ee-b9d1-0242ac120002"), "group 2");
-        when(workerWarehouseService.getWarehouseGroups(any(UUID.class), any(UUID.class))).thenReturn(
-                List.of(new GroupWarehouseDto(new BasicGroupInfoDto(UUID.fromString("4a50b7ce-9a90-11ee-b9d1-0242ac120002"), "group 1"), new BasicWarehouseInfoDto(UUID.fromString("a8ad8360-9a90-11ee-b9d1-0242ac120002"), "warehouse 1")),
-                        new GroupWarehouseDto(group1, new BasicWarehouseInfoDto(UUID.fromString("d10e7fee-9a90-11ee-b9d1-0242ac120002"), "warehouse 2")),
-                        new GroupWarehouseDto(group2, new BasicWarehouseInfoDto(UUID.fromString("a8ad8360-9a90-11ee-b9d1-0242ac120002"),"warehouse 1" )),
-                        new GroupWarehouseDto(new BasicGroupInfoDto(UUID.fromString("4a50b7ce-9a90-11ee-b9d1-0242ac120002"), "group 1"), new BasicWarehouseInfoDto(UUID.fromString("d10e7fee-9a90-11ee-b9d1-0242ac120002"),"warehouse 3" )))
-        );
+        BasicWarehouseInfoDto warehouse1 = new BasicWarehouseInfoDto(UUID.fromString("a8ad8360-9a90-11ee-b9d1-0242ac120002"), "warehouse 1");
+        BasicWarehouseInfoDto warehouse2 = new BasicWarehouseInfoDto(UUID.fromString("d10e7fee-9a90-11ee-b9d1-0242ac120002"), "warehouse 2");
+        BasicWarehouseInfoDto warehouse3 =new BasicWarehouseInfoDto(UUID.fromString("76cc2650-9ad4-11ee-b9d1-0242ac120002"),"warehouse 3" );
+        when(workerWarehouseService.getWarehouseGroups(any(UUID.class), any())).thenReturn(
+                List.of(new GroupWarehouseDto(group1,warehouse1),
+                        new GroupWarehouseDto(group1, warehouse2),
+                        new GroupWarehouseDto(group2, warehouse1),
+                        new GroupWarehouseDto(group1, warehouse3)
+        ));
         WarehouseService warehouseService = new WarehouseService(workerWarehouseService, sharingTokenService,
                 warehouseRepository, groupService, validator, userIdSupplier);
         Map<BasicGroupInfoDto, Set<BasicWarehouseInfoDto>> groupsWithWarehouses = warehouseService.getGroupsAssociatedWithWarehouse(UUID.fromString("4a50b7ce-9a90-11ee-b9d1-0242ac120002"));
         assertEquals(2, groupsWithWarehouses.keySet().size());
-        assertThat(groupsWithWarehouses.get())
+        assertEquals(Set.of(warehouse1, warehouse2, warehouse3), groupsWithWarehouses.get(group1));
+        assertEquals(Set.of(warehouse1), groupsWithWarehouses.get(group2));
     }
 
     static List<Set<WarehouseGroup>> groups() {

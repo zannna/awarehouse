@@ -14,6 +14,11 @@ public class Constants {
 
     public static final String URI_PRODUCT = "/product";
 
-    public static final String URI_PROVIDER ="/provider";
-    public static final String URI_SHELVE= "/shelve";
+    public static final String URI_PROVIDER = "/provider";
+
+    public static final String URI_SHELVE = "/shelve";
+
+    public static final String URI_REPORT = "/report";
+
+    public static final String URI_UNDERSTOCK = "/understock";
 }

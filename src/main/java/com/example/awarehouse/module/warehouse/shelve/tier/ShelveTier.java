@@ -28,7 +28,7 @@ public class ShelveTier {
     @ManyToOne
     @JoinColumn(name = "shelve_id")
     private Shelve shelve;
-
+    private double fillPercentage=0;
     public ShelveTier(int number, String name, boolean size, Dimensions dimensions) {
         this.number = number;
         this.name = name;
@@ -38,5 +38,9 @@ public class ShelveTier {
 
     public void setShelve(Shelve shelve) {
         this.shelve = shelve;
+    }
+
+    public void setDimensions(Dimensions dimensions) {
+        this.dimensions = dimensions;
     }
 }
