@@ -11,7 +11,7 @@ import java.util.UUID;
 interface ProductRepository extends JpaRepository< Product, UUID> {
     List<Product> findByGroupId(UUID uuid);
 
-    @Query("SELECT * FROM Product WHERE group.id= :groupId AND amount=0")
+    @Query("SELECT p FROM Product p WHERE p.group.id= :groupId AND p.amount=0")
     List<Product> findUnderstockByGroup(UUID groupId);
 
 }

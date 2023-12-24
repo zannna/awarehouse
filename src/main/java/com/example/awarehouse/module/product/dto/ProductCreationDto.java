@@ -1,5 +1,6 @@
 package com.example.awarehouse.module.product.dto;
 
+import com.example.awarehouse.module.warehouse.shelve.dto.DimensionsDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -24,5 +25,6 @@ public class ProductCreationDto {
     private String photo;
     private UUID groupId;
     private UUID warehouseId;
+    private DimensionsDto dimensions;
     private List<ProductWarehouseCreationDto> productWarehouses;
 }

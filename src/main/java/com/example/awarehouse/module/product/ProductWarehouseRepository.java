@@ -23,6 +23,6 @@ interface ProductWarehouseRepository extends JpaRepository<ProductWarehouse, UUI
     @Query(value="select pw from ProductWarehouse pw where pw.warehouse.id in :warehouseIds")
     List<ProductWarehouse> getAllProductsFromWarehouses(Pageable pageable,@Param("warehouseIds") List<UUID> warehouseIds);
 
-    @Query("SELECT * FROM Product WHERE warehouse.id= :warehouseId GROUP BY product.id HAVING SUM(amount)>0")
+    @Query("SELECT pw.product FROM ProductWarehouse pw JOIN pw.product p WHERE pw.warehouse.id = :warehouseId GROUP BY p HAVING SUM(pw.numberOfProducts) <= 0")
     List<Product> findUnderstockByWarehouse(UUID warehouseId);
 }

@@ -1,5 +1,5 @@
 package com.example.awarehouse.module.report;
 
-public enum ReportType {
+public enum ReportInterval {
     DAILY, WEEKLY, MONTHLY
 }

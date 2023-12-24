@@ -44,9 +44,9 @@ public class ProductWarehouse {
         this.numberOfProducts = numberOfProducts;
     }
 
-    public ProductWarehouse(Product product, Warehouse warehouse, double numberOfProducts, Optional<ShelveTier> tier) {
+    public ProductWarehouse(Product product, Warehouse warehouse, double numberOfProducts, ShelveTier tier) {
        this(product, warehouse,numberOfProducts);
-        this.tier =tier.orElse(null);
+        this.tier =tier;
     }
 
 

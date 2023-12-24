@@ -21,6 +21,12 @@ class RabbitMQConfiguration {
     @Value("${rabbitmq.queue.report.key}")
     private String reportKey;
 
+    @Value("${rabbitmq.queue.mail.name}")
+    private String mail;
+
+    @Value("${rabbitmq.queue.mail.key}")
+    private String mailKey;
+
     @Bean
     public DirectExchange exchange() {
         return new DirectExchange(exchange);
@@ -34,6 +40,16 @@ class RabbitMQConfiguration {
     @Bean
     public Binding reportBinding() {
         return BindingBuilder.bind(reportQueue()).to(exchange()).with(reportKey);
+    }
+
+    @Bean
+    public Queue mailQueue() {
+        return new Queue(mail);
+    }
+
+    @Bean
+    public Binding mailBinding() {
+        return BindingBuilder.bind(mailQueue()).to(exchange()).with(mailKey);
     }
 
     @Bean

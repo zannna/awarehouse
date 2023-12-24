@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:remove="all">Template for HTML email</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #e4edf2;
+            font-family: 'Kanit';
+            font-size: 1em;
+            margin: 0;
+            padding: 8em;
+            color: #3f3e3e;
+        }
+        .container {
+            background-color: #f5f3f3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        .table-container{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width:80%;
+        }
+        p1{
+            align-self: flex-end;
+            margin-bottom: 3em;
+            font-family: 'Kanit';
+            font-weight: bold;
+            background-color: #f5f3f3;
+            border: 1px solid #dddddd;
+            padding: 0.8em;
+        }
+        p2 {
+            font-size: 1.5em;
+            font-family: 'Kanit';
+            margin-bottom: 1em;
+        }
+        table {
+            width: 100%;
+            margin-bottom: 3em;
+        }
+
+        thead {
+            background-color: #f2f2f2;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color : rgba(130, 145, 145, 0.87);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <p1>
+        <span th:text="#{understock.warehouse.description(${reportInterval})}"></span>
+    </p1>
+    <p2>
+        <span th:text="#{understock.start(${warehouseName})}"></span>
+    </p2>
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>price</th>
+                <th>group</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${products}">
+                <td th:text="${item.id}"></td>
+                <td th:text="${item.name}"></td>
+                <td th:text="${item.price}"></td>
+                <td th:text="${item.group}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

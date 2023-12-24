@@ -13,4 +13,8 @@ public class Dimensions {
     private double height=0.0;
     private double width=0.0;
     private double length=0.0;
+
+    public double getVolume(){
+        return height*width*length;
+    }
 }

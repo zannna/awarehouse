@@ -15,4 +15,5 @@ public class ReportCommandReceiver {
     public void consumeReportCommand(List<ReportCommand> reportCommands) {
        reportCommandHandler.handle(reportCommands);
     }
+
 }

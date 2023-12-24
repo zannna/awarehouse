@@ -24,7 +24,10 @@ public class ShelveMapper {
     public static ShelveDto toShelveDto(Shelve shelve) {
         DimensionsDto dimensions =DimensionsMapper.toDto(shelve.getDimensions());
        List<ShelveTierDto> tiers = ShelveTierMapper.toTierDtoList(shelve.getShelveTiers());
-        boolean freeSpace = tiers.stream().filter(t->t.getFillPercentage()<100).findFirst().isPresent();
+       Boolean freeSpace=null;
+        if(tiers!=null) {
+           freeSpace = tiers.stream().filter(t -> t.getFillPercentage() < 100).findFirst().isPresent();
+       }
         return new ShelveDto(shelve.getId(), shelve.getNumber(), shelve.getName(),shelve.isSize(), dimensions, tiers, freeSpace);
     }
 

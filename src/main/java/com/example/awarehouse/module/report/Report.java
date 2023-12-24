@@ -19,7 +19,8 @@ public class Report {
 
     private ZonedDateTime nextGenerationDate;
 
-    private ReportType reportType;
+    @Enumerated(EnumType.STRING)
+    private ReportInterval reportInterval;
 
     private String email;
 
@@ -29,9 +30,9 @@ public class Report {
 
     private String token;
 
-    public Report(ZonedDateTime nextGenerationDate, ReportType reportType, String email, ReportScope reportScope, UUID scopeEntityId) {
+    public Report(ZonedDateTime nextGenerationDate, ReportInterval reportInterval, String email, ReportScope reportScope, UUID scopeEntityId) {
         this.nextGenerationDate = nextGenerationDate;
-        this.reportType = reportType;
+        this.reportInterval = reportInterval;
         this.email = email;
         this.reportScope = reportScope;
         this.scopeEntityId = scopeEntityId;
@@ -39,5 +40,16 @@ public class Report {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public void adjustNextGenerationTime() {
+       if(reportInterval.equals(ReportInterval.DAILY)){
+           nextGenerationDate= nextGenerationDate.plusDays(1);
+       } else if (reportInterval.equals(ReportInterval.WEEKLY)) {
+           nextGenerationDate= nextGenerationDate.plusWeeks(1);
+       } else if (reportInterval.equals(ReportInterval.MONTHLY)) {
+           nextGenerationDate= nextGenerationDate.plusMonths(1);
+
+       }
     }
 }

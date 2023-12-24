@@ -8,6 +8,7 @@ import com.example.awarehouse.module.product.mapper.ProductWarehouseMapper;
 import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.WarehouseService;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
+import com.example.awarehouse.module.warehouse.shelve.Dimensions;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
@@ -41,12 +42,9 @@ private WorkerWarehouseService workerWarehouseService;
     }
 private Product product(ProductCreationDto productDto) {
     checkIfWarehouseIdAndGroupIdNotNull(productDto);
-    UUID groupId = productDto.getGroupId();
-    WarehouseGroup group = getGroup(groupId, productDto.getAmountGroup());
-    Price price = getPrice(productDto);
-    Product product = new Product(productDto.getTitle(), productDto.getAmountGroup(), price, productDto.getPhoto(), group);
-    Product savedProduct = productRepository.save(product);
-    return savedProduct;
+    WarehouseGroup group = getGroup(productDto.getGroupId(), productDto.getAmountGroup());
+    Product product = ProductMapper.toProduct(productDto, group);
+    return productRepository.save(product);
 }
     private void checkIfWarehouseIdAndGroupIdNotNull(ProductCreationDto productDto){
        int productWarehouseSize = productDto.getProductWarehouses().size();
@@ -66,11 +64,6 @@ private Product product(ProductCreationDto productDto) {
         return warehouseGroupService.getGroup(groupId).orElse(null);
     }
 
-    private Price getPrice(ProductCreationDto productDto){
-        PriceDto priceDto = productDto.getPrice();
-        return new Price(priceDto.getAmount(), priceDto.getCurrency());
-    }
-
     private List<ProductWarehouseDto> createProductWarehouseAssociations(Product savedProduct, List<ProductWarehouseCreationDto> providedProductWarehouses){
         List<ProductWarehouseDto> productWarehouses= new ArrayList<>();
         for (ProductWarehouseCreationDto productWarehouseCreationDto :
@@ -83,13 +76,22 @@ private Product product(ProductCreationDto productDto) {
     private ProductWarehouse createProductWarehouseAssociation(ProductWarehouseCreationDto productWarehouseCreationDto, Product product) {
         UUID warehouseId = productWarehouseCreationDto.warehouseId();
         Warehouse warehouse = warehouseService.getWarehouse(warehouseId).orElseThrow(()-> new WarehouseNotExistException(WAREHOUSE_NOT_EXIST));
-        Optional<ShelveTier> tier = Optional.empty();
-        if(shelveProvided(productWarehouseCreationDto)) {
-            tier = Optional.of(tierService.getShelveTier(warehouseId, productWarehouseCreationDto.shelveNumber(), productWarehouseCreationDto.tierNumber()));
-        }
+        ShelveTier tier = getShelveTier(productWarehouseCreationDto, product);
         ProductWarehouse productWarehouse = new ProductWarehouse(product, warehouse,  productWarehouseCreationDto.amount(), tier);
         productWarehouseRepository.save(productWarehouse);
         return productWarehouse;
+    }
+
+    private ShelveTier getShelveTier(ProductWarehouseCreationDto productWarehouse, Product product){
+        if(shelveProvided(productWarehouse)) {
+            ShelveTier shelveTier = tierService.getShelveTier(productWarehouse.warehouseId(), productWarehouse.shelveNumber(), productWarehouse.tierNumber());
+            double volume = product.getDimensions().getVolume()* productWarehouse.amount();
+            shelveTier.addFillPercentage(volume);
+            return shelveTier;
+        }
+        else {
+            return null;
+        }
     }
 
     private boolean shelveProvided(ProductWarehouseCreationDto productWarehouseCreationDto) {

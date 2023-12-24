@@ -13,7 +13,6 @@ import java.util.UUID;
 @Repository
 public interface ReportRepository extends JpaRepository<Report, UUID> {
 
-    @Query(value = "SELECT * FROM Report r WHERE r.reportType = 'DAILY' OR " +
-            "r.nextGenerationDate  AT TIME ZONE 'UTC' < : currentUTCTime", nativeQuery = true)
-    public Page<Report> findToGenerate(ZonedDateTime currentUTCTime, Pageable pageable);
+    @Query(value = "SELECT * FROM Report r WHERE r.next_generation_date  AT TIME ZONE 'UTC' < :currentUTCTime", nativeQuery = true)
+    Page<Report> findToGenerate(ZonedDateTime currentUTCTime, Pageable pageable);
 }

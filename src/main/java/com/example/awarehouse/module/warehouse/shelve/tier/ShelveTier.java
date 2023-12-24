@@ -43,4 +43,8 @@ public class ShelveTier {
     public void setDimensions(Dimensions dimensions) {
         this.dimensions = dimensions;
     }
+
+    public void addFillPercentage(double volume) {
+        this.fillPercentage += 100*volume/dimensions.getVolume();
+    }
 }
