@@ -21,4 +21,8 @@ public class ShelveTierService {
     public void saveAllShelves( Set<ShelveTier> tiers){
         shelveTierRepository.saveAll(tiers);
     }
+
+    public List<ShelveTier> findFreePlace(double volume, List<UUID> warehouseIds) {
+        return shelveTierRepository.findFreeTiers(volume, warehouseIds);
+    }
 }

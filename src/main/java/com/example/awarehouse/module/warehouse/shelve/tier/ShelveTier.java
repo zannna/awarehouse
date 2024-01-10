@@ -3,7 +3,6 @@ package com.example.awarehouse.module.warehouse.shelve.tier;
 
 import com.example.awarehouse.module.warehouse.shelve.Dimensions;
 import com.example.awarehouse.module.warehouse.shelve.Shelve;
-import com.example.awarehouse.module.warehouse.shelve.dto.DimensionsDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +27,7 @@ public class ShelveTier {
     @ManyToOne
     @JoinColumn(name = "shelve_id")
     private Shelve shelve;
-    private double fillPercentage=0;
+    private double occupiedVolume =0;
     public ShelveTier(int number, String name, boolean size, Dimensions dimensions) {
         this.number = number;
         this.name = name;
@@ -44,7 +43,7 @@ public class ShelveTier {
         this.dimensions = dimensions;
     }
 
-    public void addFillPercentage(double volume) {
-        this.fillPercentage += 100*volume/dimensions.getVolume();
+    public void addOccupiedVolume(double volume) {
+        this.occupiedVolume += volume;
     }
 }

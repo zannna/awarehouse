@@ -21,4 +21,6 @@ public class Constants {
     public static final String URI_REPORT = "/report";
 
     public static final String URI_UNDERSTOCK = "/understock";
+
+    public static final String URI_FREE_PLACE = "/free-place";
 }

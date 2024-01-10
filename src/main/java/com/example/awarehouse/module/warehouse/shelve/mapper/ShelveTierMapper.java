@@ -1,6 +1,7 @@
 package com.example.awarehouse.module.warehouse.shelve.mapper;
 
 import com.example.awarehouse.module.warehouse.shelve.Dimensions;
+import com.example.awarehouse.module.warehouse.shelve.dto.BasicShelveTierInfoDto;
 import com.example.awarehouse.module.warehouse.shelve.dto.ShelveTierCreationDto;
 import com.example.awarehouse.module.warehouse.shelve.dto.ShelveTierDto;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
@@ -32,6 +33,10 @@ public class ShelveTierMapper {
     }
 
     private static ShelveTierDto toTierDto(ShelveTier shelveTier) {
-        return new ShelveTierDto(shelveTier.getId(), shelveTier.getNumber(), shelveTier.getName(), shelveTier.isSize(), DimensionsMapper.toDto(shelveTier.getDimensions()), shelveTier.getFillPercentage());
+        return new ShelveTierDto(shelveTier.getId(), shelveTier.getNumber(), shelveTier.getName(), shelveTier.isSize(), DimensionsMapper.toDto(shelveTier.getDimensions()), shelveTier.getOccupiedVolume());
+    }
+
+    public static BasicShelveTierInfoDto toBasicShelveTierInfoDto(ShelveTier shelveTier) {
+        return new BasicShelveTierInfoDto(shelveTier.getId(), shelveTier.getNumber(), shelveTier.getName(), shelveTier.getOccupiedVolume());
     }
 }

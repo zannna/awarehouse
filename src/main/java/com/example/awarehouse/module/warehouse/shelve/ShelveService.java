@@ -1,10 +1,12 @@
 package com.example.awarehouse.module.warehouse.shelve;
 
+import com.example.awarehouse.module.product.dto.ProductFreePlaceDto;
 import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.WarehouseService;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
 import com.example.awarehouse.module.warehouse.shelve.dto.*;
 import com.example.awarehouse.module.warehouse.shelve.mapper.ShelveMapper;
+import com.example.awarehouse.module.warehouse.shelve.mapper.ShelveTierMapper;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
@@ -12,6 +14,7 @@ import com.example.awarehouse.util.UserIdSupplier;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -93,4 +96,10 @@ public class ShelveService {
         return ShelveMapper.toShelveDtos(shelves);
     }
 
+    public List<FreeShelveDto> findFreePlaceForProduct(ProductFreePlaceDto freePlaceDto) {
+        workerWarehouseService.validateWorkerWarehouseRelation(freePlaceDto.warehouseIds());
+        double volume = freePlaceDto.amount()*freePlaceDto.height()*freePlaceDto.length()*freePlaceDto.width();
+        List<ShelveTier> tiers = shelveTierService.findFreePlace(volume, freePlaceDto.warehouseIds());
+        return ShelveMapper.toFreeShelveDto(tiers);
+    }
 }

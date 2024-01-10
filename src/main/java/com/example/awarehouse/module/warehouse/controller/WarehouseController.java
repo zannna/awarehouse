@@ -23,7 +23,6 @@ import static com.example.awarehouse.util.Constants.URI_WAREHOUSE;
 @AllArgsConstructor
 public class WarehouseController {
     private final WarehouseService warehouseService;
-    private final WorkerWarehouseRepository workerWarehouseRepository;
 
     @PutMapping
     public void updateWarehouse(@RequestBody WarehouseRequest warehouseRequest){

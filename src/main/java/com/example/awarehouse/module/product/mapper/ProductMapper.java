@@ -78,4 +78,8 @@ public class ProductMapper {
                 .group(group)
                 .build();
     }
+
+    public static Price toPrice(PriceDto price) {
+        return new Price(price.getAmount(), price.getCurrency());
+    }
 }

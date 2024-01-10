@@ -37,6 +37,7 @@ public class ProductController {
                                                                @RequestBody LinkDto urlProviderDto) throws IOException {
         return productProviderService.createProductsForGroupFromSite(provider, urlProviderDto);
     }
+
     @PostMapping
     public ProductDto createProduct(@RequestBody ProductCreationDto productDto) {
         return productService.createProduct(productDto);
@@ -52,6 +53,11 @@ public class ProductController {
     public ResponseEntity<List<ProductDto>> getProductsFromWarehouses(@RequestBody List<UUID> warehouseIds, @PageableDefault Pageable pageable) {
         List<ProductDto> products = productService.getProductsFromWarehouses(warehouseIds, pageable);
         return  ResponseEntity.status(HttpStatus.OK).body(products);
+    }
+
+    @PutMapping
+    public ProductDto modifyProduct(@RequestBody ProductDto productDto) {
+        return productService.modifyProduct(productDto);
     }
 
 }

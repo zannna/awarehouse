@@ -1,6 +1,8 @@
 package com.example.awarehouse.module.warehouse.shelve.controller;
 
+import com.example.awarehouse.module.product.dto.ProductFreePlaceDto;
 import com.example.awarehouse.module.warehouse.shelve.ShelveService;
+import com.example.awarehouse.module.warehouse.shelve.dto.FreeShelveDto;
 import com.example.awarehouse.module.warehouse.shelve.dto.ShelveCreationDto;
 import com.example.awarehouse.module.warehouse.shelve.dto.ShelveDto;
 import lombok.AllArgsConstructor;
@@ -27,6 +29,11 @@ public class ShelveController {
     @GetMapping
     public ResponseEntity<List<ShelveDto>> getWarehouseInventory(@PathVariable UUID warehouseId) {
         return ResponseEntity.status(HttpStatus.OK).body(shelveService.getShelves(warehouseId));
+    }
+
+    @GetMapping(URI_FREE_PLACE)
+    public List<FreeShelveDto> findFreePlaceForProduct(@RequestBody ProductFreePlaceDto freePlaceDto) {
+        return shelveService.findFreePlaceForProduct(freePlaceDto);
     }
 
 }

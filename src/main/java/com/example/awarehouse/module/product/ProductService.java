@@ -5,10 +5,13 @@ import com.example.awarehouse.module.group.WarehouseGroupService;
 import com.example.awarehouse.module.product.dto.*;
 import com.example.awarehouse.module.product.mapper.ProductMapper;
 import com.example.awarehouse.module.product.mapper.ProductWarehouseMapper;
+import com.example.awarehouse.module.product.util.exception.ProductNotExistException;
 import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.WarehouseService;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
 import com.example.awarehouse.module.warehouse.shelve.Dimensions;
+import com.example.awarehouse.module.warehouse.shelve.dto.DimensionsDto;
+import com.example.awarehouse.module.warehouse.shelve.mapper.DimensionsMapper;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.WAREHOUSE_NOT_EXIST;
 
@@ -86,7 +90,7 @@ private Product product(ProductCreationDto productDto) {
         if(shelveProvided(productWarehouse)) {
             ShelveTier shelveTier = tierService.getShelveTier(productWarehouse.warehouseId(), productWarehouse.shelveNumber(), productWarehouse.tierNumber());
             double volume = product.getDimensions().getVolume()* productWarehouse.amount();
-            shelveTier.addFillPercentage(volume);
+            shelveTier.addOccupiedVolume(volume);
             return shelveTier;
         }
         else {
@@ -155,6 +159,59 @@ private Product product(ProductCreationDto productDto) {
 
     public List<Product> findProductUnderstockByWarehouseId(UUID warehouseId) {
         return productWarehouseRepository.findUnderstockByWarehouse(warehouseId);
+    }
+
+    @Transactional
+    public ProductDto modifyProduct(ProductDto productDto) {
+        Product product = productRepository.findById(productDto.getId()).orElseThrow(()-> new ProductNotExistException("Product with id "+productDto.getId()+" not exist"));
+        product.setTitle(productDto.getTitle());
+        product.setPrice(ProductMapper.toPrice(productDto.getPrice()));
+        product.setPhoto(productDto.getPhoto());
+        List<ProductWarehouse> newProductWarehouses = new ArrayList<>();
+        for(ProductWarehouseDto productWarehouse : productDto.getProductWarehouses()){
+            if(productWarehouse.productWarehouseId()==null)
+            {
+                ProductWarehouse newProductWarehouse = createProductWarehouseAssociation(ProductWarehouseCreationDto.builder()
+                        .warehouseId(productWarehouse.warehouseId())
+                        .amount(productWarehouse.amount())
+                        .shelveNumber(productWarehouse.shelveNumber())
+                        .tierNumber(productWarehouse.tierNumber())
+                        .build(), product);
+                newProductWarehouses.add(newProductWarehouse);
+            }
+        }
+      //  List<UUID> productwarehousesIds = productDto.getProductWarehouses().stream().map(ProductWarehouseDto::productWarehouseId).collect(Collectors.toList());
+     //   List<ProductWarehouse> toSetProductWarehouses = productWarehouseRepository.findAllById(productwarehousesIds);
+//       if(productDto.getProductWarehouses().size() != toSetProductWarehouses.size()){
+//           for(UUID id: productwarehousesIds){
+//               if(!toSetProductWarehouses.contains(id)){
+//                   toSetProductWarehouses.add()
+//               }
+//           }
+//       }
+//
+//        Set<ProductWarehouse> actualProductWarehouses = product.getProductWarehouses();
+//        for(ProductWarehouse pw:  toSetProductWarehouses){
+//            if(!actualProductWarehouses.contains(pw)){
+//
+//                productWarehouseRepository.save()
+//            }
+//        }
+        if(volumeDiffer(product, productDto)){
+                }
+        product.setDimensions(DimensionsMapper.toDimensions(productDto.getDimensionsDto()));
+        product.setAmount(productDto.getAmount());
+        product.setGroup(warehouseGroupService.getGroup(productDto.getGroup().getId()).orElse(null));
+
+        productRepository.save(product);
+        return productDto;
+    }
+
+    private boolean volumeDiffer(Product product, ProductDto productDto){
+        DimensionsDto dimensionsDto= productDto.getDimensionsDto();
+        double productVolume= product.getDimensions().getVolume() * product.getAmount();
+        double dtoVolume = dimensionsDto.height()*dimensionsDto.length()*dimensionsDto.width() * productDto.getAmount();
+        return productVolume != dtoVolume;
     }
 }
 

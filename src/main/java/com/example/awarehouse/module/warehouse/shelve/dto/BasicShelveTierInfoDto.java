@@ -7,11 +7,9 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @Getter
-public class ShelveTierDto {
+public class BasicShelveTierInfoDto {
     private UUID id;
     private int number;
     private String name;
-    boolean size;
-    private DimensionsDto dimensions;
     private  double occupiedVolume;
 }
