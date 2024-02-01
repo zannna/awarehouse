@@ -1,7 +1,8 @@
-package com.example.awarehouse.module.worker;
+package com.example.awarehouse.module.auth;
 
 import com.example.awarehouse.exception.exceptions.UserNotFound;
 import com.example.awarehouse.exception.exceptions.UserUnauthorized;
+import com.example.awarehouse.module.auth.dto.UserCreationDto;
 import com.example.awarehouse.module.warehouse.Role;
 import com.example.awarehouse.util.UserIdSupplier;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,13 @@ import java.util.UUID;
 public class WorkerService {
     private final WorkerRepository workerRepository;
     private final UserIdSupplier workerIdSupplier;
+    public void registerWorker(UserCreationDto userCreationDto, UUID userId){
+        Worker worker = new Worker(userId, userCreationDto.firstName(), userCreationDto.surname());
+        workerRepository.save(worker);
+    }
+//    private Worker createWorker(UserCreationDto userCreationDto){
+//        return new Worker(userCreationDto.firstName(), userCreationDto.surname());
+//    }
     public void register(){
         Jwt token= (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Worker worker = createWorker(token);

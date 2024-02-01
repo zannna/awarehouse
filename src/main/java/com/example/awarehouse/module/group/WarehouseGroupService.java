@@ -2,13 +2,14 @@ package com.example.awarehouse.module.group;
 
 import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
 import com.example.awarehouse.module.group.dto.GroupRequest;
+import com.example.awarehouse.module.warehouse.Role;
 import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
 import com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.GroupDuplicateException;
 import com.example.awarehouse.module.group.mapper.WarehouseGroupMapper;
-import com.example.awarehouse.module.worker.Worker;
-import com.example.awarehouse.module.worker.WorkerService;
+import com.example.awarehouse.module.auth.Worker;
+import com.example.awarehouse.module.auth.WorkerService;
 import com.example.awarehouse.util.UserIdSupplier;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -102,5 +103,23 @@ public class WarehouseGroupService {
     }
 
 
+    public Set<BasicGroupInfoDto> getAllAdminGroups() {
+        UUID workerId = workerIdSupplier.getUserId();
+        Set<BasicGroupInfoDto> groups = getGroupsFromWorkerWarehousesWhereRoleIsAdmin(workerId);
+        addGroupsWhichAreNotAssociatedWithAnyWarehouses(groups, workerId);
+        return  groups;
+    }
 
+    private Set<BasicGroupInfoDto> getGroupsFromWorkerWarehousesWhereRoleIsAdmin(UUID workerId){
+        Set<Warehouse> warehouses = workerWarehouseService.getWorkerWarehouses(workerId, Role.ADMIN);
+        return warehouses
+                .stream()
+                .flatMap((w)->w.getWarehouseGroups().stream())
+                .map((g)->new BasicGroupInfoDto(g.getId(), g.getName()))
+                .collect(Collectors.toSet());
+    }
+    private void addGroupsWhichAreNotAssociatedWithAnyWarehouses(Set<BasicGroupInfoDto> groups, UUID workerId){
+        Set<BasicGroupInfoDto> groupsCreatedByWorker = warehouseGroupRepository.findByWorkerId(workerId);
+        groups.addAll(groupsCreatedByWorker);
+    }
 }

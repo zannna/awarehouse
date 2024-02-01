@@ -55,9 +55,9 @@ public class ProductController {
         return  ResponseEntity.status(HttpStatus.OK).body(products);
     }
 
-    @PutMapping
-    public ProductDto modifyProduct(@RequestBody ProductDto productDto) {
-        return productService.modifyProduct(productDto);
-    }
+//    @PutMapping
+//    public ProductDto modifyProduct(@RequestBody ProductDto productDto) {
+//        return productService.modifyProduct(productDto);
+//    }
 
 }

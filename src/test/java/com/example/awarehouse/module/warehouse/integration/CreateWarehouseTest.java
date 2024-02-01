@@ -7,7 +7,7 @@ import com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto;
 import com.example.awarehouse.module.warehouse.dto.WarehouseIdDto;
 import com.example.awarehouse.module.group.WarehouseGroup;
 import com.example.awarehouse.module.warehouse.util.factory.WarehouseJsonFactory;
-import com.example.awarehouse.module.worker.WorkerRepository;
+import com.example.awarehouse.module.auth.WorkerRepository;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

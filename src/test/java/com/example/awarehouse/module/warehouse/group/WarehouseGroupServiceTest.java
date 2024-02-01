@@ -11,8 +11,8 @@ import com.example.awarehouse.module.group.dto.GroupRequest;
 import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
 import com.example.awarehouse.module.warehouse.group.util.factory.WarehouseGroupFactory;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.GroupDuplicateException;
-import com.example.awarehouse.module.worker.WorkerService;
-import com.example.awarehouse.module.worker.util.WorkerConstants;
+import com.example.awarehouse.module.auth.WorkerService;
+import com.example.awarehouse.module.auth.util.WorkerConstants;
 import com.example.awarehouse.util.UserIdSupplier;
 import org.junit.jupiter.api.Test;
 

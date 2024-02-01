@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.example.awarehouse.util.Constants.*;
 
@@ -29,6 +30,12 @@ public class WarehouseGroupController {
     @GetMapping
     ResponseEntity<Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>>> getAllGroupsWithWarehouses(){
         Map<BasicGroupInfoDto,List<BasicWarehouseInfoDto>> groups =groupService.getAllGroupsWithWarehouses();
+        return  ResponseEntity.status(HttpStatus.OK).body(groups);
+    }
+
+    @GetMapping("/admin")
+    ResponseEntity<Set<BasicGroupInfoDto>> getAllAdminGroups(){
+        Set<BasicGroupInfoDto> groups =groupService.getAllAdminGroups();
         return  ResponseEntity.status(HttpStatus.OK).body(groups);
     }
 }

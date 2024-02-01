@@ -29,6 +29,9 @@ public class WorkerWarehouseService {
     public Set<Warehouse> getWorkerWarehouses(UUID workerId){
         return workerWarehouseRepository.findWorkerWarehouses(workerId);
     }
+    public Set<Warehouse> getWorkerWarehouses(UUID workerId, Role role){
+        return workerWarehouseRepository.findWorkerWarehouses(workerId, role);
+    }
     public void validateWorkerWarehouseRelation(List<UUID> warehouseIds){
         UUID workerId = workerIdSupplier.getUserId();
         for (UUID warehouseId: warehouseIds) {

@@ -9,7 +9,7 @@ import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.WorkerWarehouse;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
 import com.example.awarehouse.module.warehouse.util.factory.WarehouseFactory;
-import com.example.awarehouse.module.worker.WorkerService;
+import com.example.awarehouse.module.auth.WorkerService;
 import com.example.awarehouse.util.UserIdSupplier;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ import static com.example.awarehouse.exception.util.constants.ExceptionConstants
 import static com.example.awarehouse.module.token.util.SharingTokenFactory.createSharingToken;
 import static com.example.awarehouse.module.warehouse.util.WarehouseTestConstants.WAREHOUSE_ID;
 import static com.example.awarehouse.module.warehouse.util.factory.WorkerWarehouseFactory.createWorkerWarehouse;
-import static com.example.awarehouse.module.worker.util.WorkerConstants.WORKER_ID;
+import static com.example.awarehouse.module.auth.util.WorkerConstants.WORKER_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;

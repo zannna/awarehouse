@@ -10,7 +10,7 @@ import com.example.awarehouse.module.warehouse.Role;
 import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.WorkerWarehouse;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
-import com.example.awarehouse.module.worker.WorkerService;
+import com.example.awarehouse.module.auth.WorkerService;
 import com.example.awarehouse.util.UserIdSupplier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

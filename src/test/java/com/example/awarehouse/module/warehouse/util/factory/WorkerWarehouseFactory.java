@@ -5,8 +5,8 @@ import com.example.awarehouse.module.warehouse.WorkerWarehouse;
 
 import static com.example.awarehouse.module.warehouse.util.factory.WarehouseFactory.createSecondWarehouse;
 import static com.example.awarehouse.module.warehouse.util.factory.WarehouseFactory.createWarehouse;
-import static com.example.awarehouse.module.worker.util.factory.WorkerFactory.createSecondWorker;
-import static com.example.awarehouse.module.worker.util.factory.WorkerFactory.createWorker;
+import static com.example.awarehouse.module.auth.util.factory.WorkerFactory.createSecondWorker;
+import static com.example.awarehouse.module.auth.util.factory.WorkerFactory.createWorker;
 
 public class WorkerWarehouseFactory {
 

@@ -1,7 +1,7 @@
 package com.example.awarehouse.common.util;
 
-import com.example.awarehouse.module.worker.Worker;
-import com.example.awarehouse.module.worker.WorkerRepository;
+import com.example.awarehouse.module.auth.Worker;
+import com.example.awarehouse.module.auth.WorkerRepository;
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.jwt.JWTParser;
 import org.apache.http.client.utils.URIBuilder;

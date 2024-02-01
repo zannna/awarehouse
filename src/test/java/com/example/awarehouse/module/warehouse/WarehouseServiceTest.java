@@ -10,7 +10,7 @@ import com.example.awarehouse.module.warehouse.util.factory.GroupFactory;
 import com.example.awarehouse.module.warehouse.util.factory.WarehouseDtoFactory;
 
 import com.example.awarehouse.module.warehouse.util.factory.WorkerWarehouseFactory;
-import com.example.awarehouse.module.worker.util.factory.WorkerFactory;
+import com.example.awarehouse.module.auth.util.factory.WorkerFactory;
 import com.example.awarehouse.util.UserIdSupplier;
 import jakarta.validation.Validator;
 

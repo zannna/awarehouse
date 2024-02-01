@@ -1,14 +1,7 @@
 package com.example.awarehouse.module.product.dto;
 
 import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
-import com.example.awarehouse.module.product.Price;
-import com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto;
-import com.example.awarehouse.module.warehouse.shelve.Dimensions;
 import com.example.awarehouse.module.warehouse.shelve.dto.DimensionsDto;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
-
-import java.util.Set;
 import lombok.*;
 
 import java.util.List;

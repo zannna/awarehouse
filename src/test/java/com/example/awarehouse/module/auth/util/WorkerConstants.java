@@ -1,4 +1,4 @@
-package com.example.awarehouse.module.worker.util;
+package com.example.awarehouse.module.auth.util;
 
 import java.util.UUID;
 

@@ -1,4 +1,4 @@
-package com.example.awarehouse.module.worker;
+package com.example.awarehouse.module.auth;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

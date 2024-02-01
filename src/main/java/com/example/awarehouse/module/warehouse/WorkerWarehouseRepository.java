@@ -25,6 +25,9 @@ public interface WorkerWarehouseRepository extends JpaRepository<WorkerWarehouse
     @Query("select distinct ww.warehouse from WorkerWarehouse ww where ww.worker.id =:workerId ")
     Set<Warehouse> findWorkerWarehouses(UUID workerId);
 
+    @Query("select distinct ww.warehouse from WorkerWarehouse ww where ww.worker.id =:workerId and ww.role =:role")
+    Set<Warehouse> findWorkerWarehouses(UUID workerId, Role role);
+
     @Query("SELECT  new com.example.awarehouse.module.warehouse.dto.GroupWarehouseDto(new com.example.awarehouse.module.group.dto.BasicGroupInfoDto(wg.id, wg.name), new com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto(ww.warehouse.id, ww.warehouse.name))" +
             " FROM WorkerWarehouse ww " +
             "JOIN ww.warehouse.warehouseGroups wg " +

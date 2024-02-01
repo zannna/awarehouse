@@ -1,8 +1,7 @@
-package com.example.awarehouse.module.worker;
+package com.example.awarehouse.module.auth;
 
 import com.example.awarehouse.module.warehouse.WorkerWarehouse;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
