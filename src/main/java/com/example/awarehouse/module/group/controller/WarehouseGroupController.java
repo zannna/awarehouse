@@ -3,6 +3,7 @@ package com.example.awarehouse.module.group.controller;
 import com.example.awarehouse.module.group.WarehouseGroupService;
 import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
 import com.example.awarehouse.module.group.dto.GroupRequest;
+import com.example.awarehouse.module.group.dto.GroupWithWarehouses;
 import com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,8 +29,8 @@ public class WarehouseGroupController {
     }
 
     @GetMapping
-    ResponseEntity<Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>>> getAllGroupsWithWarehouses(){
-        Map<BasicGroupInfoDto,List<BasicWarehouseInfoDto>> groups =groupService.getAllGroupsWithWarehouses();
+    ResponseEntity<List<GroupWithWarehouses>> getAllGroupsWithWarehouses(){
+        List<GroupWithWarehouses> groups =groupService.getAllGroupsWithWarehouses();
         return  ResponseEntity.status(HttpStatus.OK).body(groups);
     }
 

@@ -2,6 +2,7 @@ package com.example.awarehouse.module.group;
 
 import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
 import com.example.awarehouse.module.group.dto.GroupRequest;
+import com.example.awarehouse.module.group.dto.GroupWithWarehouses;
 import com.example.awarehouse.module.warehouse.Role;
 import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.GROUP_ALREADY_EXIST;
 
@@ -49,15 +51,28 @@ public class WarehouseGroupService {
         return warehouseGroupRepository.findById(groupId);
     }
 
-    public Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>> getAllGroupsWithWarehouses() {
+    public List<GroupWithWarehouses> getAllGroupsWithWarehouses() {
         UUID workerId = workerIdSupplier.getUserId();
-        Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>> groupsWithWarehouses = getGroupsFromWorkerWarehouses(workerId);
-        addGroupsWhichAreNotAssociatedWithAnyWarehouses(groupsWithWarehouses, workerId);
+        Set<Warehouse> warehouses = workerWarehouseService.getWorkerWarehouses(workerId);
+        Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>> basicInfoMap = getGroupsWithWarehouses(warehouses);
+        addGroupsWhichAreNotAssociatedWithAnyWarehouses(basicInfoMap, workerId);
+        List<GroupWithWarehouses> groupsWithWarehouses = WarehouseGroupMapper.toGroupWithWarehouses(basicInfoMap);
+        addWarehouseWhichNotHaveGroup(warehouses, groupsWithWarehouses);
         return groupsWithWarehouses;
     }
 
-    public Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>> getGroupsFromWorkerWarehouses(UUID workerId){
-        Set<Warehouse> warehouses = workerWarehouseService.getWorkerWarehouses(workerId);
+    private void addWarehouseWhichNotHaveGroup( Set<Warehouse> warehouses, List<GroupWithWarehouses> groupsWithWarehouses) {
+        List<BasicWarehouseInfoDto> addedWarehouses =  groupsWithWarehouses.stream()
+                .flatMap(groupWithWarehouses -> groupWithWarehouses.warehouses().stream()).collect(Collectors.toList());
+        for (Warehouse warehouse : warehouses) {
+            boolean added= addedWarehouses.stream().anyMatch(w-> w.id().equals(warehouse.getId()));
+            if(!added){
+                groupsWithWarehouses.add(new GroupWithWarehouses(null, List.of(new BasicWarehouseInfoDto(warehouse.getId(), warehouse.getName()))));
+            }
+        }
+    }
+
+    public Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>> getGroupsWithWarehouses(Set<Warehouse> warehouses){
         Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>> groupsWithWarehouses = new HashMap<>();
         for (Warehouse warehouse: warehouses) {
             addWarehouseGroupsToGroupsWithWarehouses(groupsWithWarehouses, warehouse);
