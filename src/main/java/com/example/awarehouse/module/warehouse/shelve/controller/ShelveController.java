@@ -3,7 +3,7 @@ package com.example.awarehouse.module.warehouse.shelve.controller;
 import com.example.awarehouse.module.product.dto.ProductFreePlaceDto;
 import com.example.awarehouse.module.warehouse.shelve.ShelveService;
 import com.example.awarehouse.module.warehouse.shelve.dto.FreeShelveDto;
-import com.example.awarehouse.module.warehouse.shelve.dto.ShelveCreationDto;
+import com.example.awarehouse.module.warehouse.shelve.dto.ShelfCreationDto;
 import com.example.awarehouse.module.warehouse.shelve.dto.ShelveDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,13 +16,13 @@ import java.util.UUID;
 import static com.example.awarehouse.util.Constants.*;
 
 @RestController
-@RequestMapping(URI_VERSION_V1+URI_WAREHOUSE+"/{warehouseId}"+URI_SHELVE)
+@RequestMapping(URI_VERSION_V1+URI_WAREHOUSE+"/{warehouseId}"+ URI_SHELF)
 @AllArgsConstructor
 public class ShelveController {
     private final ShelveService shelveService;
 
     @PostMapping
-    public ResponseEntity<ShelveDto> createShelve(@PathVariable UUID warehouseId, @RequestBody ShelveCreationDto shelveDto) {
+    public ResponseEntity<ShelveDto> createShelve(@PathVariable UUID warehouseId, @RequestBody ShelfCreationDto shelveDto) {
         return ResponseEntity.status(HttpStatus.OK).body(shelveService.createShelve(warehouseId, shelveDto));
     }
 
@@ -34,6 +34,12 @@ public class ShelveController {
     @GetMapping(URI_FREE_PLACE)
     public List<FreeShelveDto> findFreePlaceForProduct(@RequestBody ProductFreePlaceDto freePlaceDto) {
         return shelveService.findFreePlaceForProduct(freePlaceDto);
+    }
+
+    @DeleteMapping("/{shelveId}")
+    public ResponseEntity<HttpStatus> deleteShelve(@PathVariable UUID shelveId){
+        shelveService.removeShelve(shelveId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

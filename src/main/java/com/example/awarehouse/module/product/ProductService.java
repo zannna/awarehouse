@@ -5,13 +5,10 @@ import com.example.awarehouse.module.group.WarehouseGroupService;
 import com.example.awarehouse.module.product.dto.*;
 import com.example.awarehouse.module.product.mapper.ProductMapper;
 import com.example.awarehouse.module.product.mapper.ProductWarehouseMapper;
-import com.example.awarehouse.module.product.util.exception.ProductNotExistException;
 import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.WarehouseService;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
-import com.example.awarehouse.module.warehouse.shelve.Dimensions;
 import com.example.awarehouse.module.warehouse.shelve.dto.DimensionsDto;
-import com.example.awarehouse.module.warehouse.shelve.mapper.DimensionsMapper;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
@@ -23,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.WAREHOUSE_NOT_EXIST;
 
@@ -88,7 +84,7 @@ private Product product(ProductCreationDto productDto) {
 
     private ShelveTier getShelveTier(ProductWarehouseCreationDto productWarehouse, Product product){
         if(shelveProvided(productWarehouse)) {
-            ShelveTier shelveTier = tierService.getShelveTier(productWarehouse.warehouseId(), productWarehouse.shelveNumber(), productWarehouse.tierNumber());
+            ShelveTier shelveTier = tierService.getShelveTier(productWarehouse.warehouseId(), productWarehouse.shelfNumber(), productWarehouse.tierNumber());
             double volume = product.getDimensions().getVolume()* productWarehouse.amount();
             shelveTier.addOccupiedVolume(volume);
             return shelveTier;
@@ -99,7 +95,7 @@ private Product product(ProductCreationDto productDto) {
     }
 
     private boolean shelveProvided(ProductWarehouseCreationDto productWarehouseCreationDto) {
-        if(productWarehouseCreationDto.shelveNumber() != null && productWarehouseCreationDto.tierNumber() != null){
+        if(productWarehouseCreationDto.shelfNumber() != null && productWarehouseCreationDto.tierNumber() != null){
             return true;
         }
         else {
@@ -174,7 +170,7 @@ private Product product(ProductCreationDto productDto) {
 //                ProductWarehouse newProductWarehouse = createProductWarehouseAssociation(ProductWarehouseCreationDto.builder()
 //                        .warehouseId(productWarehouse.warehouseId())
 //                        .amount(productWarehouse.amount())
-//                        .shelveNumber(productWarehouse.shelveNumber())
+//                        .shelfNumber(productWarehouse.shelfNumber())
 //                        .tierNumber(productWarehouse.tierNumber())
 //                        .build(), product);
 //                newProductWarehouses.add(newProductWarehouse);
@@ -207,11 +203,11 @@ private Product product(ProductCreationDto productDto) {
 //        return productDto;
 //    }
 
-    private boolean volumeDiffer(Product product, ProductDto productDto){
-        DimensionsDto dimensionsDto= productDto.getDimensionsDto();
-        double productVolume= product.getDimensions().getVolume() * product.getAmount();
-        double dtoVolume = dimensionsDto.height()*dimensionsDto.length()*dimensionsDto.width() * productDto.getAmount();
-        return productVolume != dtoVolume;
-    }
+//    private boolean volumeDiffer(Product product, ProductDto productDto){
+//        DimensionsDto dimensionsDto= productDto.getDimensionsDto();
+//        double productVolume= product.getDimensions().getVolume() * product.getAmount();
+//        double dtoVolume = dimensionsDto.height()*dimensionsDto.length()*dimensionsDto.width() * productDto.getAmount();
+//        return productVolume != dtoVolume;
+//    }
 }
 

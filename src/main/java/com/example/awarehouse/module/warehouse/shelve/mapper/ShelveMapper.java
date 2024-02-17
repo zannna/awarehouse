@@ -5,14 +5,16 @@ import com.example.awarehouse.module.warehouse.shelve.Dimensions;
 import com.example.awarehouse.module.warehouse.shelve.Shelve;
 import com.example.awarehouse.module.warehouse.shelve.dto.*;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
+import com.example.awarehouse.module.warehouse.util.unit.MetricConverter;
+import com.example.awarehouse.module.warehouse.util.unit.MetricConverterProvider;
 
 import java.util.*;
 
 public class ShelveMapper {
 
-    public static Shelve toShelve(ShelveCreationDto shelveDto, Warehouse warehouse) {
-        Dimensions dimensions =DimensionsMapper.toDimensions(shelveDto.getDimensions());
-        Set<ShelveTier> tiers = ShelveTierMapper.toTierSet(shelveDto.getTiers());
+    public static Shelve toShelve(ShelfCreationDto shelveDto, Warehouse warehouse) {
+        Dimensions dimensions =DimensionsMapper.toDimensions(shelveDto.getDimensions(), warehouse.getUnit());
+        Set<ShelveTier> tiers = ShelveTierMapper.toTierSet(shelveDto.getTiers(), warehouse.getUnit());
         return new Shelve(shelveDto.getNumber(), shelveDto.getName(),  dimensions, shelveDto.isSize(), tiers, warehouse);
     }
 

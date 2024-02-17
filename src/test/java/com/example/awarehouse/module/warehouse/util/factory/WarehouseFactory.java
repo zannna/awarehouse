@@ -1,7 +1,7 @@
 package com.example.awarehouse.module.warehouse.util.factory;
 
 import com.example.awarehouse.module.token.SharingToken;
-import com.example.awarehouse.module.warehouse.LengthUnit;
+import com.example.awarehouse.module.warehouse.util.unit.LengthUnit;
 import com.example.awarehouse.module.warehouse.Warehouse;
 
 import java.util.HashSet;

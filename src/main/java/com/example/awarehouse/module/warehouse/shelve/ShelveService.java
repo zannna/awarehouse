@@ -6,7 +6,6 @@ import com.example.awarehouse.module.warehouse.WarehouseService;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
 import com.example.awarehouse.module.warehouse.shelve.dto.*;
 import com.example.awarehouse.module.warehouse.shelve.mapper.ShelveMapper;
-import com.example.awarehouse.module.warehouse.shelve.mapper.ShelveTierMapper;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
@@ -14,7 +13,6 @@ import com.example.awarehouse.util.UserIdSupplier;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -28,7 +26,7 @@ public class ShelveService {
     private final UserIdSupplier workerIdSupplier;
     private final ShelveTierService shelveTierService;
 
-    public ShelveDto createShelve(UUID warehouseId, ShelveCreationDto shelveDto) {
+    public ShelveDto createShelve(UUID warehouseId, ShelfCreationDto shelveDto) {
         workerWarehouseService.validateWorkerWarehouseRelation(  workerIdSupplier.getUserId(), warehouseId);
         validateIfShelveNumberNotExistInWarehouse(warehouseId,shelveDto.getNumber());
         checkShelveDimension(shelveDto);
@@ -60,7 +58,7 @@ public class ShelveService {
         }
     }
 
-    private void checkShelveDimension(ShelveCreationDto shelveDto){
+    private void checkShelveDimension(ShelfCreationDto shelveDto){
         if(shelveDto.isSize()){
             checkDimension(shelveDto.getDimensions());
         }
@@ -101,5 +99,11 @@ public class ShelveService {
         double volume = freePlaceDto.amount()*freePlaceDto.height()*freePlaceDto.length()*freePlaceDto.width();
         List<ShelveTier> tiers = shelveTierService.findFreePlace(volume, freePlaceDto.warehouseIds());
         return ShelveMapper.toFreeShelveDto(tiers);
+    }
+
+    public void removeShelve(UUID shelveId) {
+        Shelve shelve = shelveRepository.findById(shelveId).orElseThrow(() -> new IllegalArgumentException("Shelve with id " + shelveId + " does not exist"));
+        shelveTierService.removeShelfTiers(shelve.getShelveTiers());
+        shelveRepository.deleteById(shelve.getId());
     }
 }

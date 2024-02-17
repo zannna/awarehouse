@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -15,6 +14,6 @@ public class ShelveDto {
     private String name;
     private boolean size;
     private DimensionsDto dimensions;
-    private List<ShelveTierDto> shelveTiers;
+    private List<ShelveTierDto> tiers;
     private Boolean hasFreeSpace;
 }

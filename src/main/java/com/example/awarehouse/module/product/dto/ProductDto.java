@@ -19,8 +19,8 @@ public class ProductDto {
     private double amount;
     private PriceDto price;
     private String photo;
-    private DimensionsDto dimensionsDto;
     private BasicGroupInfoDto group;
     private List<ProductWarehouseDto> productWarehouses;
+    private DimensionsDto dimensions;
 
 }

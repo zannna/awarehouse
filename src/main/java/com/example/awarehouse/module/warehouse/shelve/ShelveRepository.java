@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-interface ShelveRepository extends JpaRepository<Shelve, Long> {
+interface ShelveRepository extends JpaRepository<Shelve, UUID> {
     Optional<Shelve> findByWarehouseIdAndNumber(UUID warehouseId, int number);
 
     List<Shelve> findAllByWarehouseIdOrderByNumber(UUID warehouseId);

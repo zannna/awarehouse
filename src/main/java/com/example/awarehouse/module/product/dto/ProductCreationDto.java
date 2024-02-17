@@ -24,6 +24,7 @@ public class ProductCreationDto {
     @Pattern(regexp = LINK_REGEX, message = LINK_HAS_INVALID_FORMAT)
     private String photo;
     private UUID groupId;
+    // do usunięcia
     private UUID warehouseId;
     private DimensionsDto dimensions;
     private List<ProductWarehouseCreationDto> productWarehouses;

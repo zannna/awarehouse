@@ -1,9 +1,11 @@
-package com.example.awarehouse.util.configuration;
-
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
+//package com.example.awarehouse.util.configuration;
+//
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.web.servlet.config.annotation.CorsRegistry;
+//import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+//
+//import java.util.List;
+//
 //@Configuration
 //public class CorsConfiguration implements WebMvcConfigurer {
 //
@@ -12,7 +14,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 //        registry
 //                .addMapping("/**")
 //                .allowedOrigins("*")
-//                .allowedHeaders("Accept-Language", "Content-Type")
-//                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH");
+//                .allowedHeaders("Accept-Language", "Cache-Control",  "Content-Type")
+//                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
+//                .allowCredentials(true)
+//                .exposedHeaders("Authorization");
 //    }
 //}

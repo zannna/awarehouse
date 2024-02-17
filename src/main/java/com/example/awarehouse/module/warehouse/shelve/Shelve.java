@@ -30,7 +30,7 @@ public class Shelve {
     boolean size;
 
 
-    @OneToMany(mappedBy="shelve", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="shelve", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
     private Set<ShelveTier> shelveTiers;
 
     @ManyToOne

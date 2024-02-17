@@ -1,6 +1,6 @@
 package com.example.awarehouse.module.warehouse.dto;
 
-import com.example.awarehouse.module.warehouse.LengthUnit;
+import com.example.awarehouse.module.warehouse.util.unit.LengthUnit;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.lang.NonNull;

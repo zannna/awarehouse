@@ -21,6 +21,7 @@ import static com.example.awarehouse.util.Constants.URI_WAREHOUSE;
 @RestController
 @RequestMapping(URI_VERSION_V1+URI_WAREHOUSE)
 @AllArgsConstructor
+//@CrossOrigin
 public class WarehouseController {
     private final WarehouseService warehouseService;
 

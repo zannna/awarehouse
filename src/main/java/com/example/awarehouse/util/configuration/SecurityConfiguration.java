@@ -7,6 +7,8 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 import com.example.awarehouse.util.UserIdSupplier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -14,9 +16,15 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -35,11 +43,13 @@ class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(AbstractHttpConfigurer::disable)
+                .cors((cors) -> cors
+                .configurationSource( myWebsiteConfigurationSource()))
+                        //.cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(requests ->
                 requests
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
         ).sessionManagement(session -> session.sessionCreationPolicy(STATELESS));
 
        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter)));
@@ -54,4 +64,25 @@ class SecurityConfiguration {
             return UUID.fromString(token.getClaim("sub"));};
     }
 
+    @Bean
+    CorsConfigurationSource myWebsiteConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("*");
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+//        CorsConfiguration corsConfiguration = new CorsConfiguration();
+////        configuration.setAllowedOrigins(Arrays.asList("*"));
+////        configuration.setAllowedMethods(Arrays.asList("*"));
+////        configuration.setAllowedHeaders(Arrays.asList("*"));
+//        corsConfiguration.setAllowedHeaders(List.of("*"));
+//        corsConfiguration.setAllowedOrigins(List.of("*"));
+//        corsConfiguration.setAllowedMethods(List.of("*"));
+//        corsConfiguration.setAllowCredentials(true);
+//       // corsConfiguration.setExposedHeaders(List.of("Authorization"));
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", corsConfiguration);
+        return source;
+    }
 }

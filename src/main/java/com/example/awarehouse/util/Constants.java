@@ -16,11 +16,12 @@ public class Constants {
 
     public static final String URI_PROVIDER = "/provider";
 
-    public static final String URI_SHELVE = "/shelve";
+    public static final String URI_SHELF = "/shelf";
 
     public static final String URI_REPORT = "/report";
 
     public static final String URI_UNDERSTOCK = "/understock";
 
     public static final String URI_FREE_PLACE = "/free-place";
+    public static final String URI_TIER = "/tier";
 }

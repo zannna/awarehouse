@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -24,7 +25,8 @@ public class WorkerWarehouseService {
     }
 
     public List<BasicWarehouseInfoDto> getWarehouses(UUID workerId) {
-        return workerWarehouseRepository.findWorkerWarehousesBasicInformation(workerId).orElseGet(()-> new ArrayList<>());
+        return workerWarehouseRepository.findWorkerWarehousesBasicInformation(workerId).stream()
+                .map((w)->new BasicWarehouseInfoDto(w.getId(), w.getName())).collect(Collectors.toList());
     }
     public Set<Warehouse> getWorkerWarehouses(UUID workerId){
         return workerWarehouseRepository.findWorkerWarehouses(workerId);

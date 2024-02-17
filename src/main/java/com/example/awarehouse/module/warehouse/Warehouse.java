@@ -2,6 +2,7 @@ package com.example.awarehouse.module.warehouse;
 
 import com.example.awarehouse.module.group.WarehouseGroup;
 import com.example.awarehouse.module.token.SharingToken;
+import com.example.awarehouse.module.warehouse.util.unit.LengthUnit;
 import jakarta.persistence.*;
 import lombok.*;
 

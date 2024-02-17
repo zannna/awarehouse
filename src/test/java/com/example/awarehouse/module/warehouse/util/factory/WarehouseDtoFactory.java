@@ -1,13 +1,10 @@
 package com.example.awarehouse.module.warehouse.util.factory;
 
-import com.example.awarehouse.module.warehouse.LengthUnit;
-import com.example.awarehouse.module.warehouse.Warehouse;
+import com.example.awarehouse.module.warehouse.util.unit.LengthUnit;
 import com.example.awarehouse.module.warehouse.dto.WarehouseCreation;
 
 import java.util.Set;
 import java.util.UUID;
-
-import static com.example.awarehouse.module.warehouse.util.factory.GroupFactory.createSetOfGroups;
 
 public class WarehouseDtoFactory {
 

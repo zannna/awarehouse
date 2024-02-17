@@ -10,12 +10,13 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @Getter
-public class ShelveCreationDto {
+public class ShelfCreationDto {
     @NotNull(message = "Number is mandatory")
     private int number;
     private String name;
     boolean size;
     private DimensionsDto dimensions;
+    private double shelfUnit;
     private boolean sameSizeTiers;
     private List<ShelveTierCreationDto> tiers;
 }
