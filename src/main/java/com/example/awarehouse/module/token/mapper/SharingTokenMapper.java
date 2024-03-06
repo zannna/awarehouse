@@ -1,10 +1,10 @@
 package com.example.awarehouse.module.token.mapper;
 
 import com.example.awarehouse.module.token.SharingToken;
-import com.example.awarehouse.module.token.dto.SharingTokenResponse;
+import com.example.awarehouse.module.token.dto.SharingTokenDto;
 
 public class SharingTokenMapper {
-    public static SharingTokenResponse toDto(SharingToken sharingToken){
-        return new SharingTokenResponse(sharingToken.getSharingToken());
+    public static SharingTokenDto toDto(SharingToken sharingToken){
+        return new SharingTokenDto(sharingToken.getSharingToken());
     }
 }

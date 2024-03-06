@@ -1,7 +1,6 @@
 package com.example.awarehouse.module.token;
 
-import com.example.awarehouse.module.token.dto.SharingTokenResponse;
-import com.example.awarehouse.module.token.dto.WarehouseId;
+import com.example.awarehouse.module.token.dto.SharingTokenDto;
 import com.example.awarehouse.module.token.exception.exceptions.SharingTokenNotExist;
 import com.example.awarehouse.module.token.exception.exceptions.WarehouseNotHasSharingToken;
 import com.example.awarehouse.module.warehouse.Role;
@@ -64,7 +63,7 @@ class SharingTokenServiceTest {
                 workerService, workerWarehouseService, workerIdSupplier);
 
         //when
-        SharingTokenResponse sharingToken = sharingTokenService.getSharingToken(WAREHOUSE_ID);
+        SharingTokenDto sharingToken = sharingTokenService.getSharingToken(WAREHOUSE_ID);
 
         //then
         assertThat(sharingToken.sharingToken()).isNotNull();

@@ -1,7 +1,9 @@
 package com.example.awarehouse.module.auth.controller;
 
+import com.example.awarehouse.module.administration.AdministrationManagement;
 import com.example.awarehouse.module.auth.KeycloakService;
 import com.example.awarehouse.module.auth.WorkerService;
+import com.example.awarehouse.module.administration.dto.AdminWorkersDto;
 import com.example.awarehouse.module.auth.dto.LoginDto;
 import com.example.awarehouse.module.auth.dto.UserCreationDto;
 import lombok.AllArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.example.awarehouse.util.Constants.*;
@@ -23,6 +26,7 @@ import static com.example.awarehouse.util.Constants.*;
 public class AuthController {
     WorkerService workerService;
     KeycloakService keycloakService;
+    AdministrationManagement administrationManagement;
     @GetMapping
     void register() {
       workerService.register();
@@ -41,9 +45,4 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(accessToken);
     }
 
-//    @GetMapping("/refresh-token")
-//    ResponseEntity<String> getRefreshToken() {
-//        String refreshToken = keycloakService.getRefreshToken();
-//        return ResponseEntity.status(HttpStatus.OK).body(refreshToken);
-//    }
 }

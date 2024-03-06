@@ -46,4 +46,8 @@ public class ShelveTier {
     public void addOccupiedVolume(double volume) {
         this.occupiedVolume += volume;
     }
+
+    public void removeOccupiedVolume(double volume) {
+        this.occupiedVolume -= volume;
+    }
 }

@@ -1,8 +1,7 @@
 package com.example.awarehouse.module.token.controller;
 
 import com.example.awarehouse.module.token.SharingTokenService;
-import com.example.awarehouse.module.token.dto.SharingTokenResponse;
-import com.example.awarehouse.module.token.dto.WarehouseId;
+import com.example.awarehouse.module.token.dto.SharingTokenDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,16 +17,16 @@ import static com.example.awarehouse.util.Constants.*;
 public class SharingTokenController {
     SharingTokenService sharingTokenService;
 
-    @GetMapping( URI_WAREHOUSE+"/{warehouseId}")
-    public ResponseEntity<SharingTokenResponse> getSharingToken(@PathVariable UUID warehouseId){
-        SharingTokenResponse sharingToken = sharingTokenService.getSharingToken(warehouseId);
+    @GetMapping("/{ownerId}")
+    public ResponseEntity<SharingTokenDto> getSharingToken(@PathVariable UUID ownerId){
+        SharingTokenDto sharingToken = sharingTokenService.getSharingToken(ownerId);
         return  ResponseEntity.status(HttpStatus.OK).body(sharingToken);
     }
 
-    @PostMapping("/{sharingTokenId}")
-    public ResponseEntity<WarehouseId> joinWarehouse(@PathVariable String sharingTokenId){
-        WarehouseId warehouseId = sharingTokenService.joinWarehouse(sharingTokenId);
-        return ResponseEntity.status(HttpStatus.OK).body(warehouseId);
+    @PostMapping
+    public ResponseEntity<HttpStatus> joinWarehouse(@RequestBody SharingTokenDto sharingTokenDto){
+        sharingTokenService.joinWarehouse( sharingTokenDto);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 

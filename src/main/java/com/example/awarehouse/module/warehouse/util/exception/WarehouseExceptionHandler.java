@@ -7,20 +7,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.NoSuchElementException;
+
 import static com.example.awarehouse.exception.ExceptionResponseFactory.basicErrorResponse;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @ControllerAdvice
 public class WarehouseExceptionHandler {
-    @ExceptionHandler({GroupDuplicateException.class,})
+    @ExceptionHandler({GroupDuplicateException.class})
     ResponseEntity<BasicErrorDto> warehouseBadRequestException(Exception e, HttpServletRequest request) {
         return basicErrorResponse(e, request, BAD_REQUEST);
     }
 
     @ExceptionHandler({ShelveNotExist.class, WarehouseNotExistException.class,
-    WorkerWarehouseRelationNotExist.class, GroupNotExistException.class})
+    WorkerWarehouseRelationNotExist.class, GroupNotExistException.class, NoSuchElementException.class})
     ResponseEntity<BasicErrorDto> warehouseNotFoundException(Exception e, HttpServletRequest request) {
         return basicErrorResponse(e, request, NOT_FOUND);
+    }
+
+    @ExceptionHandler({WorkerNotHaveAccess.class})
+    ResponseEntity<BasicErrorDto> workerNotHaveAccessException(Exception e, HttpServletRequest request) {
+        return basicErrorResponse(e, request, FORBIDDEN);
     }
 }

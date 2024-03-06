@@ -7,6 +7,6 @@ public class WarehouseGroupMapper {
     public static BasicGroupInfoDto toDto(WarehouseGroup warehouseGroup){
         if(warehouseGroup == null)
             return null;
-        return new BasicGroupInfoDto(warehouseGroup.getId(), warehouseGroup.getName());
+        return new BasicGroupInfoDto(warehouseGroup.getId(), warehouseGroup.getName(), null);
     }
 }

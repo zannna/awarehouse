@@ -5,8 +5,6 @@ import com.example.awarehouse.module.warehouse.shelve.Dimensions;
 import com.example.awarehouse.module.warehouse.shelve.Shelve;
 import com.example.awarehouse.module.warehouse.shelve.dto.*;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
-import com.example.awarehouse.module.warehouse.util.unit.MetricConverter;
-import com.example.awarehouse.module.warehouse.util.unit.MetricConverterProvider;
 
 import java.util.*;
 
@@ -15,7 +13,7 @@ public class ShelveMapper {
     public static Shelve toShelve(ShelfCreationDto shelveDto, Warehouse warehouse) {
         Dimensions dimensions =DimensionsMapper.toDimensions(shelveDto.getDimensions(), warehouse.getUnit());
         Set<ShelveTier> tiers = ShelveTierMapper.toTierSet(shelveDto.getTiers(), warehouse.getUnit());
-        return new Shelve(shelveDto.getNumber(), shelveDto.getName(),  dimensions, shelveDto.isSize(), tiers, warehouse);
+        return new Shelve(shelveDto.getNumber(), shelveDto.getName(),  dimensions, shelveDto.isSize(), tiers, warehouse, shelveDto.getRow());
     }
 
     public static ShelveDto toShelveDto(Shelve shelve) {
@@ -25,7 +23,7 @@ public class ShelveMapper {
         if(tiers!=null) {
            freeSpace = shelve.getShelveTiers().stream().anyMatch(t -> t.getOccupiedVolume()/ t.getDimensions().getVolume() < 1);
        }
-        return new ShelveDto(shelve.getId(), shelve.getNumber(), shelve.getName(),shelve.isSize(), dimensions, tiers, freeSpace);
+        return new ShelveDto(shelve.getId(), shelve.getNumber(), shelve.getName(),shelve.isSize(), dimensions, tiers, freeSpace, shelve.getRow());
     }
 
     public static List<ShelveDto> toShelveDtos(List<Shelve> shelves) {

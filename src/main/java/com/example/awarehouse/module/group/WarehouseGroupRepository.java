@@ -1,6 +1,7 @@
 package com.example.awarehouse.module.group;
 
 import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
+import com.example.awarehouse.module.warehouse.dto.GroupResponseDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -16,5 +17,5 @@ public interface WarehouseGroupRepository extends JpaRepository<WarehouseGroup, 
 @Query(value = "INSERT INTO warehouse_group (name, worker_id) VALUES(:name, :workerId) RETURNING  *", nativeQuery = true)
 WarehouseGroup createGroup(String name, UUID workerId);
 
-Set<BasicGroupInfoDto> findByWorkerId(UUID workerId);
+Set<WarehouseGroup> findByWorkerId(UUID workerId);
 }

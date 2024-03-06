@@ -1,8 +1,7 @@
 package com.example.awarehouse.module.token.controller;
 
 import com.example.awarehouse.module.token.SharingTokenService;
-import com.example.awarehouse.module.token.dto.SharingTokenResponse;
-import com.example.awarehouse.module.token.dto.WarehouseId;
+import com.example.awarehouse.module.token.dto.SharingTokenDto;
 import com.example.awarehouse.module.token.exception.exceptions.SharingTokenNotExist;
 import com.example.awarehouse.module.token.exception.exceptions.WarehouseNotHasSharingToken;
 import org.junit.jupiter.api.Test;
@@ -35,7 +34,7 @@ class SharingTokenControllerTest {
 
     @Test
     void getSharingToken_whenDataAreCorrect_shouldReturnSharingToken() throws Exception {
-        when(sharingTokenService.getSharingToken(WAREHOUSE_ID)).thenReturn(new SharingTokenResponse("token"));
+        when(sharingTokenService.getSharingToken(WAREHOUSE_ID)).thenReturn(new SharingTokenDto("token"));
         mvc
                 // when
                 .perform(

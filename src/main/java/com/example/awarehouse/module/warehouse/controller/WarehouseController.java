@@ -2,7 +2,6 @@ package com.example.awarehouse.module.warehouse.controller;
 
 import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
 import com.example.awarehouse.module.warehouse.WarehouseService;
-import com.example.awarehouse.module.warehouse.WorkerWarehouseRepository;
 import com.example.awarehouse.module.warehouse.dto.*;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -15,13 +14,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.example.awarehouse.util.Constants.URI_VERSION_V1;
-import static com.example.awarehouse.util.Constants.URI_WAREHOUSE;
+import static com.example.awarehouse.util.Constants.*;
 
 @RestController
 @RequestMapping(URI_VERSION_V1+URI_WAREHOUSE)
 @AllArgsConstructor
-//@CrossOrigin
 public class WarehouseController {
     private final WarehouseService warehouseService;
 
@@ -43,15 +40,32 @@ public class WarehouseController {
         return ResponseEntity.status(HttpStatus.OK).body(warehouses);
     }
 
-    @PostMapping("/{groupId}")
-    ResponseEntity<HttpStatus> addWarehouseToGroup(@PathVariable UUID groupId, @RequestBody WarehouseIdDto warehouseIdDto){
-        warehouseService.addWarehouseToGroup(groupId, warehouseIdDto);
+    @GetMapping("/{warehouseId}/row")
+    public int getWarehouseNumberOfRows(@PathVariable UUID warehouseId){
+        return warehouseService.getWarehouseNumberOfRows(warehouseId);
+    }
+
+    @PostMapping("/{warehouseId}"+URI_GROUP)
+    ResponseEntity<HttpStatus> addGroupToWarehouse(@RequestBody BasicGroupInfoDto group, @PathVariable UUID warehouseId){
+        warehouseService.addWarehouseToGroup(group.id(), warehouseId);
         return  ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PostMapping("/{warehouseId}/group")
+    @DeleteMapping("/{warehouseId}"+URI_GROUP+"/{groupId}")
+    ResponseEntity<HttpStatus> removeGroupFromWarehouse(@PathVariable UUID warehouseId, @PathVariable UUID groupId){
+        warehouseService.removeGroupFromWarehouse(warehouseId, groupId);
+        return  ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @GetMapping("/{warehouseId}/group")
     public ResponseEntity<Map<BasicGroupInfoDto, Set<BasicWarehouseInfoDto>>> getGroupsAssociatedWithWarehouse(@PathVariable UUID warehouseId){
         Map<BasicGroupInfoDto, Set<BasicWarehouseInfoDto>> groupWithWarehouses = warehouseService.getGroupsAssociatedWithWarehouse(warehouseId);
         return ResponseEntity.status(HttpStatus.OK).body(groupWithWarehouses);
     }
+    @PutMapping("/{warehouseId}/row")
+    ResponseEntity<HttpStatus> updateWarehouseNumberOfRows(@PathVariable UUID warehouseId,  @RequestParam(name = "rowsNumber")  Integer rowsNumber){
+        warehouseService.updateWarehouseNumberOfRows(warehouseId, rowsNumber);
+        return  ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 }

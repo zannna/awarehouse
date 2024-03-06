@@ -1,9 +1,12 @@
 package com.example.awarehouse.module.auth;
 
+import com.example.awarehouse.module.group.GroupWorker;
 import com.example.awarehouse.module.warehouse.WorkerWarehouse;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -25,6 +28,10 @@ public class Worker {
 
     @OneToMany(mappedBy = "worker")
     private Set<WorkerWarehouse> workerWarehouses = new HashSet<>();
+
+    @OneToMany(mappedBy = "worker", cascade = CascadeType.PERSIST)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Set<GroupWorker> groupWorkers = new HashSet<>();
 
     public Worker(UUID id, String firstName, String lastName) {
         this.id = id;

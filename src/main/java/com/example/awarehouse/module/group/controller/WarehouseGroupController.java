@@ -3,15 +3,16 @@ package com.example.awarehouse.module.group.controller;
 import com.example.awarehouse.module.group.WarehouseGroupService;
 import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
 import com.example.awarehouse.module.group.dto.GroupRequest;
-import com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto;
+import com.example.awarehouse.module.group.dto.GroupWithWarehouses;
+import com.example.awarehouse.module.warehouse.dto.BasicInfo;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static com.example.awarehouse.util.Constants.*;
 
@@ -27,15 +28,21 @@ public class WarehouseGroupController {
         return ResponseEntity.status(HttpStatus.CREATED).body(basicGroupInfoDto);
     }
 
+    @DeleteMapping("/{groupIds}")
+    ResponseEntity<HttpStatus> deleteGroup(@PathVariable List<UUID> groupIds){
+        groupService.deleteGroup(groupIds);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @GetMapping
-    ResponseEntity<Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>>> getAllGroupsWithWarehouses(){
-        Map<BasicGroupInfoDto,List<BasicWarehouseInfoDto>> groups =groupService.getAllGroupsWithWarehouses();
+    ResponseEntity<List<GroupWithWarehouses>> getAllGroupsWithWarehouses(){
+        List<GroupWithWarehouses> groups = groupService.getAllGroupsWithWarehouses();
         return  ResponseEntity.status(HttpStatus.OK).body(groups);
     }
 
     @GetMapping("/admin")
-    ResponseEntity<Set<BasicGroupInfoDto>> getAllAdminGroups(){
-        Set<BasicGroupInfoDto> groups =groupService.getAllAdminGroups();
+    ResponseEntity<Set<BasicInfo>> getAllAdminGroups(){
+        Set<BasicInfo> groups =groupService.getAllAdminGroups();
         return  ResponseEntity.status(HttpStatus.OK).body(groups);
     }
 }

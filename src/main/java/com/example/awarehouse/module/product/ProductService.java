@@ -5,21 +5,27 @@ import com.example.awarehouse.module.group.WarehouseGroupService;
 import com.example.awarehouse.module.product.dto.*;
 import com.example.awarehouse.module.product.mapper.ProductMapper;
 import com.example.awarehouse.module.product.mapper.ProductWarehouseMapper;
+import com.example.awarehouse.module.storage.FileSystemStorageService;
+import com.example.awarehouse.module.storage.StorageService;
 import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.WarehouseService;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
-import com.example.awarehouse.module.warehouse.shelve.dto.DimensionsDto;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.WAREHOUSE_NOT_EXIST;
 
@@ -30,24 +36,37 @@ private ProductRepository productRepository;
 private WarehouseService warehouseService;
 private WarehouseGroupService warehouseGroupService;
 private ShelveTierService tierService;
+private ProductWarehouseService productWarehouseService;
 private ProductWarehouseRepository productWarehouseRepository;
 private WorkerWarehouseService workerWarehouseService;
+private final StorageService storageService =  new FileSystemStorageService();
 
     @Transactional
-    public ProductDto createProduct(ProductCreationDto productDto) {
+    public ProductDto createProduct(MultipartFile file, ProductCreationDto productDto) {
         Product savedProduct = product(productDto);
-        List<ProductWarehouseDto> productWarehouses = createProductWarehouseAssociations(savedProduct, productDto.getProductWarehouses());
+       List<ProductWarehouseDto> productWarehouses = createProductWarehouseAssociations(savedProduct, productDto.getProductWarehouses());
         setGroupAmountIfNotExist(savedProduct, productWarehouses);
+        if(file!=null && !file.isEmpty()){
+            saveFile(file, savedProduct);
+        }
         return ProductMapper.toDto(savedProduct, productWarehouses);
     }
-private Product product(ProductCreationDto productDto) {
-    checkIfWarehouseIdAndGroupIdNotNull(productDto);
-    WarehouseGroup group = getGroup(productDto.getGroupId(), productDto.getAmountGroup());
-    Product product = ProductMapper.toProduct(productDto, group);
-    return productRepository.save(product);
-}
+    void saveFile(MultipartFile file, Product savedProduct) {
+        String newFileName = file.getOriginalFilename()+"_"+savedProduct.getId();
+        savedProduct.setPhoto(file.getOriginalFilename());
+        storageService.store(file, newFileName);
+    }
+    private Product product(ProductCreationDto productDto) {
+        checkIfWarehouseIdAndGroupIdNotNull(productDto);
+        WarehouseGroup group = getGroup(productDto.getGroupId(), productDto.getAmountGroup());
+        Product product = ProductMapper.toProduct(productDto, group);
+        return productRepository.save(product);
+    }
     private void checkIfWarehouseIdAndGroupIdNotNull(ProductCreationDto productDto){
-       int productWarehouseSize = productDto.getProductWarehouses().size();
+        int productWarehouseSize = 0;
+        if(productDto.getProductWarehouses()!=null) {
+            productWarehouseSize = productDto.getProductWarehouses().size();
+        }
         UUID groupId = productDto.getGroupId();
         if(productWarehouseSize ==0 && groupId== null){
             throw new IllegalArgumentException("WarehouseId or groupId must be provided");
@@ -112,42 +131,95 @@ private Product product(ProductCreationDto productDto) {
 
     }
 
-    public Page<ProductDto> getProductsFromWarehouse(UUID warehouseId, Pageable pageable) {
+    public Page<ProductDto> getProductsFromWarehouse(UUID warehouseId, Pageable pageable){
         workerWarehouseService.validateWorkerWarehouseRelation(warehouseId);
-        Page<ProductDto> products = productWarehouseRepository.getAllProductsByWarehouseId(pageable, warehouseId).map(ProductMapper::toDto);
-        return products;
+        return productWarehouseRepository.getAllProductsByWarehouseId(pageable, warehouseId).map(ProductMapper::toDto);
     }
 
-    public List<ProductDto> getProductsFromWarehouses(List<UUID> warehouseIds, Pageable pageable) {
-        workerWarehouseService.validateWorkerWarehouseRelation(warehouseIds);
-        List<ProductWarehouse> productsPage = productWarehouseRepository. getAllProductsFromWarehouses(pageable, warehouseIds);
-        List<ProductDto> products = convertToProductDtoList(productsPage);
-        return products;
-    }
-
-    private List<ProductDto> convertToProductDtoList(List<ProductWarehouse> productsPage) {
-        Iterator<ProductWarehouse> iterator = productsPage.iterator();
-        List<ProductDto> products = new ArrayList<>();
-        while (!productsPage.isEmpty()) {
-            ProductWarehouse productWarehouse = iterator.next();
-            ProductDto product = ProductMapper.toDto(productWarehouse);
-            products.add(product);
-            iterator.remove();
-            findOtherProductWarehouses(iterator, product, products);
-            iterator = productsPage.iterator();
+    public Page<ProductDto> getProductsFromWarehouses(FilterDto filterDto, Pageable pageable) {
+        Map<FilterField, SortDirection> sortConditions =  filterDto.getSortConditions().entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> FilterField.fromString(entry.getKey()),
+                        entry -> SortDirection.fromString(entry.getValue())
+                ));
+        Map<FilterField, String> searchConditions =  filterDto.getSearchConditions().entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> FilterField.fromString(entry.getKey()),
+                        Map.Entry::getValue
+                ));
+        workerWarehouseService.validateWorkerWarehouseRelation(filterDto.getWarehouseIds());
+        Specification<ProductWarehouse> spec = Specification
+                .where(ProductWarehouseSpecification.orderBy(sortConditions))
+                .and(ProductWarehouseSpecification.containsLike(searchConditions))
+                .and(ProductWarehouseSpecification.hasWarehouseIn(filterDto.getWarehouseIds()));
+        Page<ProductDto> productPage = productWarehouseRepository.findAll(spec, pageable).map(ProductMapper::toDto);
+        if(addingProductsWithOnlyGroupIsRequired(filterDto)){
+            List<ProductDto> products = addProductsWithOnlyGroup( productPage, sortConditions);
+            return new PageImpl<>(
+                    products,
+                    PageRequest.of(
+                            productPage.getNumber(),
+                            productPage.getSize()),
+                    productPage.getTotalElements()
+            );
         }
-        return products;
+        return productPage;
     }
-
-    private void findOtherProductWarehouses(Iterator<ProductWarehouse> iterator, ProductDto productDto, List<ProductDto> products) {
-        while (iterator.hasNext()) {
-            ProductWarehouse next = iterator.next();
-            if (next.getProduct().getId().equals(productDto.getId())) {
-                productDto.getProductWarehouses().add(ProductWarehouseMapper.toDto(next));
-                iterator.remove();
+    private boolean addingProductsWithOnlyGroupIsRequired(FilterDto filterDto){
+        return filterDto.getGroupIds()!=null && !filterDto.getGroupIds().isEmpty();
+    }
+    private List<ProductDto> addProductsWithOnlyGroup( Page<ProductDto> productPage, Map<FilterField, SortDirection> sortConditions){
+        Set<UUID> productIds= productPage.stream().map(ProductDto::getId).collect(Collectors.toSet());
+        List<ProductDto> products= new ArrayList<>(productPage.getContent());
+        ListIterator<ProductDto> iterator = products.listIterator();
+        if(sortConditions.get(FilterField.AMOUNT) == null || sortConditions.get(FilterField.AMOUNT).equals(SortDirection.ASC)){
+            while (iterator.hasNext()) {
+                ProductDto current = iterator.next();
+                if ( productIds.contains(current.getId())) {
+                    iterator.previous();
+                    iterator.add(ProductMapper.toProductDtoWithOnlyGroup(current));
+                    iterator.next();
+                    productIds.remove(current.getId());
+                }
             }
         }
+        else {
+            while (iterator.hasPrevious()) {
+                ProductDto current = iterator.previous();
+                ProductDto next = iterator.next();
+                if ( next.getId() != current.getId() && productIds.contains(current.getId())) {
+                    iterator.add(ProductMapper.toProductDtoWithOnlyGroup(current));
+                    iterator.previous();
+                    productIds.remove(current.getId());
+                }
+            }
+        }
+        return products;
     }
+
+//    private List<ProductDto> convertToProductDtoList(List<ProductWarehouse> productsPage) {
+//        Iterator<ProductWarehouse> iterator = productsPage.iterator();
+//        List<ProductDto> products = new ArrayList<>();
+//        while (!productsPage.isEmpty()) {
+//            ProductWarehouse productWarehouse = iterator.next();
+//            ProductDto product = ProductMapper.toDto(productWarehouse);
+//            products.add(product);
+//            iterator.remove();
+//            findOtherProductWarehouses(iterator, product, products);
+//            iterator = productsPage.iterator();
+//        }
+//        return products;
+//    }
+
+//    private void findOtherProductWarehouses(Iterator<ProductWarehouse> iterator, ProductDto productDto, List<ProductDto> products) {
+//        while (iterator.hasNext()) {
+//            ProductWarehouse next = iterator.next();
+//            if (next.getProduct().getId().equals(productDto.getId())) {
+//                productDto.getProductWarehouses().add(ProductWarehouseMapper.toDto(next));
+//                iterator.remove();
+//            }
+//        }
+//    }
 
     public List<Product> findProductUnderstockByGroupId(UUID groupId) {
         return productRepository.findUnderstockByGroup(groupId);
@@ -155,6 +227,18 @@ private Product product(ProductCreationDto productDto) {
 
     public List<Product> findProductUnderstockByWarehouseId(UUID warehouseId) {
         return productWarehouseRepository.findUnderstockByWarehouse(warehouseId);
+    }
+
+    @Transactional
+    public void moveProducts(MoveProductsDto moveProductsDto) {
+        ShelveTier tier =tierService.getShelveTier(moveProductsDto.getWarehouseId(), moveProductsDto.getShelfNumber(), moveProductsDto.getTierNumber());
+        productWarehouseService.moveProductsToTier(moveProductsDto.getProductWarehouseMoveInfos(), tier);
+    }
+
+    public void deleteProducts(DeleteProductsDto deleteProductsDto) {
+        productWarehouseService. removeProductWarehousesByProductIds(deleteProductsDto.getProductIds());
+        productWarehouseService.removeProductWarehouses(deleteProductsDto.getProductWarehouseIds());
+        productRepository.deleteProductsById(deleteProductsDto.getProductIds());
     }
 
 //    @Transactional

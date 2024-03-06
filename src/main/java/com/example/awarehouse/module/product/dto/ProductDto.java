@@ -18,9 +18,9 @@ public class ProductDto {
     private String title;
     private double amount;
     private PriceDto price;
-    private String photo;
     private BasicGroupInfoDto group;
     private List<ProductWarehouseDto> productWarehouses;
     private DimensionsDto dimensions;
+    private String image;
 
 }

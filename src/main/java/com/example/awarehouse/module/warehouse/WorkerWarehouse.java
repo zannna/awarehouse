@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "worker_warehouse")
 @NoArgsConstructor
@@ -14,8 +16,8 @@ import lombok.NoArgsConstructor;
 public class WorkerWarehouse {
     @Id
     @Column(name = "ww_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name="worker_id")
@@ -28,12 +30,7 @@ public class WorkerWarehouse {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-
-    public Long getId() {
-        return id;
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

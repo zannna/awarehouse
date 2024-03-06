@@ -20,9 +20,5 @@ public class WarehouseMapper {
                 .map(GroupMapper::toGroupResponseDto).collect(Collectors.toSet());
         return new WarehouseResponseDto(warehouse.getId(), warehouse.getName(), warehouse.getUnit().name(), warehouse.getRowsNumber(), groups);
     }
-    public static BasicWarehouseInfoDto toBasicWarehouseInfoDto(Warehouse warehouse){
-        if(warehouse == null)
-            return null;
-        return new BasicWarehouseInfoDto(warehouse.getId(), warehouse.getName());
-    }
+
 }

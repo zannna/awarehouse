@@ -41,7 +41,7 @@ public class Product {
     @JoinColumn(name = "group_id")
    private WarehouseGroup group;
 
-   @OneToMany(mappedBy = "product",  fetch = FetchType.EAGER)
+   @OneToMany(mappedBy = "product")
    private Set<ProductWarehouse> productWarehouses = new HashSet<>();
 
     public Product(String title, double amount, Price price, String photo, WarehouseGroup group) {
@@ -55,6 +55,13 @@ public class Product {
     public Set<ProductWarehouse> addProductWarehouse(ProductWarehouse productWarehouse){
         productWarehouses.add(productWarehouse);
         return productWarehouses;
+    }
+    public String getPhotoFullName(){
+        return photo+"_"+id;
+    }
+
+    public void subtractAmount(double amount){
+        this.amount -= amount;
     }
 
 }

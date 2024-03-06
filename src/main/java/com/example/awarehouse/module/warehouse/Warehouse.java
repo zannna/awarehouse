@@ -37,8 +37,6 @@ public class Warehouse {
     @OneToMany(mappedBy = "warehouse")
     private Set<WorkerWarehouse> workerWarehouses = new HashSet<>();
 
-    @OneToOne(mappedBy = "warehouse", cascade = CascadeType.ALL)
-    private SharingToken sharingToken;
 
     public Warehouse(String name, LengthUnit unit, int rowsNumber, Set<WarehouseGroup> warehouseGroups) {
         this.name = name;
@@ -66,5 +64,9 @@ public class Warehouse {
 
     public void addGroup(WarehouseGroup group){
         warehouseGroups.add(group);
+    }
+
+    public void setRowsNumber(int rowsNumber) {
+        this.rowsNumber = rowsNumber;
     }
 }

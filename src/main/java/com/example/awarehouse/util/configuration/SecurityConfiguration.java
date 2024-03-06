@@ -1,6 +1,7 @@
 package com.example.awarehouse.util.configuration;
 
 
+import static com.example.awarehouse.util.Constants.URI_AUTH;
 import static com.example.awarehouse.util.Constants.URI_VERSION_V1;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -47,10 +48,13 @@ class SecurityConfiguration {
                 .configurationSource( myWebsiteConfigurationSource()))
                         //.cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
+//                .authorizeHttpRequests(requests -> requests.anyRequest().permitAll())
                 .authorizeHttpRequests(requests ->
                 requests
+                        .requestMatchers(URI_VERSION_V1 + URI_AUTH+"/**").permitAll()
                         .anyRequest().authenticated()
-        ).sessionManagement(session -> session.sessionCreationPolicy(STATELESS));
+        )
+                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS));
 
        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter)));
 
@@ -69,7 +73,7 @@ class SecurityConfiguration {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("*");
         configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*");
+        configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
 //        CorsConfiguration corsConfiguration = new CorsConfiguration();

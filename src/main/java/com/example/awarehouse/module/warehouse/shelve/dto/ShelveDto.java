@@ -16,4 +16,5 @@ public class ShelveDto {
     private DimensionsDto dimensions;
     private List<ShelveTierDto> tiers;
     private Boolean hasFreeSpace;
+    private int row;
 }

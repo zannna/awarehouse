@@ -1,9 +1,12 @@
 package com.example.awarehouse.module.token;
 
+import com.example.awarehouse.module.group.WarehouseGroup;
 import com.example.awarehouse.module.warehouse.Warehouse;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
@@ -17,15 +20,15 @@ public class SharingToken {
     private String sharingToken;
 
     private String salt;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "warehouse_id", referencedColumnName = "warehouse_id")
-    Warehouse warehouse;
 
-    public SharingToken(String sharingToken, String salt, Warehouse warehouse) {
+    private UUID tokenOwnerId;
+
+    private  OwnerType ownerType;
+
+    public SharingToken(String sharingToken, String salt, UUID tokenOwnerId, OwnerType ownerType) {
         this.sharingToken = sharingToken;
         this.salt = salt;
-        this.warehouse = warehouse;
+        this.tokenOwnerId = tokenOwnerId;
+        this.ownerType = ownerType;
     }
-
-
 }

@@ -1,14 +1,12 @@
 package com.example.awarehouse.module.token;
 
 
-import com.example.awarehouse.module.token.dto.SharingTokenResponse;
-import com.example.awarehouse.module.token.dto.WarehouseId;
+import com.example.awarehouse.module.group.GroupWorkerService;
+import com.example.awarehouse.module.token.dto.SharingTokenDto;
 import com.example.awarehouse.module.token.exception.exceptions.SharingTokenNotExist;
 import com.example.awarehouse.module.token.exception.exceptions.WarehouseNotHasSharingToken;
 import com.example.awarehouse.module.token.mapper.SharingTokenMapper;
 import com.example.awarehouse.module.warehouse.Role;
-import com.example.awarehouse.module.warehouse.Warehouse;
-import com.example.awarehouse.module.warehouse.WorkerWarehouse;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
 import com.example.awarehouse.module.auth.WorkerService;
 import com.example.awarehouse.util.UserIdSupplier;
@@ -33,27 +31,34 @@ public class SharingTokenService {
 
     private final UserIdSupplier workerIdSupplier;
 
+    private final GroupWorkerService groupWorkerService;
 
-    public SharingToken createSharingToken(Warehouse warehouse) {
+
+    public SharingToken createSharingToken(UUID warehouseId, OwnerType ownerType) {
         String salt = tokenGenerator.generateSalt();
-        String token = tokenGenerator.generateToken(warehouse.getId().toString(), salt);
-        SharingToken sharingToken = new SharingToken(token, salt, warehouse);
+        String token = tokenGenerator.generateToken(warehouseId.toString(), salt);
+        SharingToken sharingToken = new SharingToken(token, salt, warehouseId, ownerType);
         sharingToken = sharingTokenRepository.save(sharingToken);
         return sharingToken;
     }
 
-    public SharingTokenResponse getSharingToken(UUID warehouseId) {
+
+    public SharingTokenDto getSharingToken(UUID tokenOwnerId) {
         workerService.validateIfWorkerIsAdmin(workerIdSupplier.getUserId());
-        return sharingTokenRepository.findByWarehouseId(warehouseId)
+        return sharingTokenRepository.findByTokenOwnerId(tokenOwnerId)
                 .map(SharingTokenMapper::toDto)
                 .orElseThrow(() ->new WarehouseNotHasSharingToken(WAREHOUSE_NOT_CONTAIN_SHARINGTOKEN));
     }
 
-    public WarehouseId joinWarehouse(String sharingTokenValue) {
-       SharingToken sharingToken = sharingTokenRepository.findBySharingToken(sharingTokenValue).orElseThrow(()->
+    public void  joinWarehouse(SharingTokenDto sharingTokenDto) {
+       SharingToken sharingToken = sharingTokenRepository.findBySharingToken( sharingTokenDto.sharingToken()).orElseThrow(()->
                 new SharingTokenNotExist(SHARINGTOKEN_NOT_EXIST));
-        WorkerWarehouse workerWarehouse = workerWarehouseService.newRelation(sharingToken.getWarehouse().getId(), workerIdSupplier.getUserId(), Role.WORKER);
-        return new WarehouseId(workerWarehouse.getWarehouse().getId());
+       if(sharingToken.getOwnerType().equals(OwnerType.WAREHOUSE)) {
+            workerWarehouseService.newRelation(sharingToken.getTokenOwnerId(), workerIdSupplier.getUserId(), Role.WORKER);
+       }
+       else if(sharingToken.getOwnerType().equals(OwnerType.GROUP)){
+           groupWorkerService.addWorkerToGroup(sharingToken.getTokenOwnerId(), workerIdSupplier.getUserId());
+       }
     }
 
 }

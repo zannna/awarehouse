@@ -18,5 +18,6 @@ public class ShelfCreationDto {
     private DimensionsDto dimensions;
     private double shelfUnit;
     private boolean sameSizeTiers;
+    private int row;
     private List<ShelveTierCreationDto> tiers;
 }

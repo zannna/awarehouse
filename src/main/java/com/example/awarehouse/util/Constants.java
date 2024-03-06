@@ -24,4 +24,8 @@ public class Constants {
 
     public static final String URI_FREE_PLACE = "/free-place";
     public static final String URI_TIER = "/tier";
+
+    public static final String URI_SEARCH = "/search";
+    public static final String URI_MOVE = "/move";
+    public static final  String URI_ADMIN = "/admin";
 }

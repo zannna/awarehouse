@@ -6,39 +6,63 @@ import com.example.awarehouse.module.product.Price;
 import com.example.awarehouse.module.product.Product;
 import com.example.awarehouse.module.product.ProductWarehouse;
 import com.example.awarehouse.module.product.dto.*;
+import com.example.awarehouse.module.product.util.ImageUtils;
+import com.example.awarehouse.module.storage.FileSystemStorageService;
+import com.example.awarehouse.module.storage.StorageService;
 import com.example.awarehouse.module.warehouse.shelve.mapper.DimensionsMapper;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 public class ProductMapper {
+    private final StorageService storageService = new FileSystemStorageService();
 
     public static BasicProductInfoDto toBasicDto(Product product) {
         return new BasicProductInfoDto(product.getId(), product.getTitle(), product.getAmount(), toPriceDto(product.getPrice()), product.getPhoto(), WarehouseGroupMapper.toDto(product.getGroup()));
     }
+
     public static ProductDto toDto(ProductWarehouse productWarehouse) {
         List<ProductWarehouseDto> productWarehouses = new ArrayList<>();
         productWarehouses.add(ProductWarehouseMapper.toDto(productWarehouse));
         return toDto(productWarehouse.getProduct(), productWarehouses);
     }
+
     public static ProductDto toDto(Product product) {
         return ProductDto.builder()
                 .id(product.getId())
                 .title(product.getTitle())
                 .amount(product.getAmount())
                 .price(toPriceDto(product.getPrice()))
-                .photo(product.getPhoto())
+                .image(toStringPhoto(product.getPhotoFullName()))
                 .group(WarehouseGroupMapper.toDto(product.getGroup()))
                 .build();
     }
-        public static ProductDto toDto(Product product,  List<ProductWarehouseDto> productWarehouses) {
-            ProductDto productDto = toDto(product);
-            productDto.setProductWarehouses(productWarehouses);
-            return productDto;
-        }
 
-    private static PriceDto toPriceDto(Price price){
+    private static String toStringPhoto(String fileName) {
+        Path imagePath = Paths.get(FileSystemStorageService.rootLocation + "\\" + fileName);
+        if (Files.exists(imagePath)) {
+            try {
+                return ImageUtils.encodeFileToBase64Binary(imagePath);
+            } catch (IOException e) {
+                return "";
+            }
+        } else {
+            return "";
+        }
+    }
+
+    public static ProductDto toDto(Product product, List<ProductWarehouseDto> productWarehouses) {
+        ProductDto productDto = toDto(product);
+        productDto.setProductWarehouses(productWarehouses);
+        return productDto;
+    }
+
+    private static PriceDto toPriceDto(Price price) {
         return new PriceDto(price.getAmount(), price.getCurrency());
     }
 
@@ -49,14 +73,15 @@ public class ProductMapper {
     }
 
     private static String toPriceString(Price price) {
-        return  price.getAmount() + " " + price.getCurrency();
+        return price.getAmount() + " " + price.getCurrency();
     }
 
     public static UnderstockedProductInGroupDto toUnderstockedProductInGroupDto(Product product) {
-        String warehouses = toWarehouseNameStringList( product.getProductWarehouses());
-        return new UnderstockedProductInGroupDto(product.getId(), product.getTitle(),toPriceString(product.getPrice()), warehouses);
+        String warehouses = toWarehouseNameStringList(product.getProductWarehouses());
+        return new UnderstockedProductInGroupDto(product.getId(), product.getTitle(), toPriceString(product.getPrice()), warehouses);
     }
-    private static String toWarehouseNameStringList(Set<ProductWarehouse> productWarehouses){
+
+    private static String toWarehouseNameStringList(Set<ProductWarehouse> productWarehouses) {
         String warehouses = "";
         StringBuilder stringBuilder = new StringBuilder();
         for (ProductWarehouse productWarehouse : productWarehouses) {
@@ -82,4 +107,16 @@ public class ProductMapper {
     public static Price toPrice(PriceDto price) {
         return new Price(price.getAmount(), price.getCurrency());
     }
+
+    public static ProductDto toProductDtoWithOnlyGroup(ProductDto product) {
+        return ProductDto.builder()
+                .id(product.getId())
+                .title(product.getTitle())
+                .amount(product.getAmount())
+                .price(product.getPrice())
+                .image(product.getImage())
+                .group(product.getGroup())
+                .build();
+    }
+
 }
