@@ -10,6 +10,8 @@ import com.example.awarehouse.module.storage.StorageService;
 import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.WarehouseService;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
+import com.example.awarehouse.module.warehouse.shelve.Shelve;
+import com.example.awarehouse.module.warehouse.shelve.ShelveService;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
@@ -40,6 +42,7 @@ private ProductWarehouseService productWarehouseService;
 private ProductWarehouseRepository productWarehouseRepository;
 private WorkerWarehouseService workerWarehouseService;
 private final StorageService storageService =  new FileSystemStorageService();
+private ShelveService shelveService;
 
     @Transactional
     public ProductDto createProduct(MultipartFile file, ProductCreationDto productDto) {
@@ -95,17 +98,19 @@ private final StorageService storageService =  new FileSystemStorageService();
     private ProductWarehouse createProductWarehouseAssociation(ProductWarehouseCreationDto productWarehouseCreationDto, Product product) {
         UUID warehouseId = productWarehouseCreationDto.warehouseId();
         Warehouse warehouse = warehouseService.getWarehouse(warehouseId).orElseThrow(()-> new WarehouseNotExistException(WAREHOUSE_NOT_EXIST));
-        ShelveTier tier = getShelveTier(productWarehouseCreationDto, product);
+        ShelveTier tier = processAddingToShelveTier(productWarehouseCreationDto, product);
         ProductWarehouse productWarehouse = new ProductWarehouse(product, warehouse,  productWarehouseCreationDto.amount(), tier);
         productWarehouseRepository.save(productWarehouse);
         return productWarehouse;
     }
 
-    private ShelveTier getShelveTier(ProductWarehouseCreationDto productWarehouse, Product product){
+    private ShelveTier processAddingToShelveTier(ProductWarehouseCreationDto productWarehouse, Product product){
         if(shelveProvided(productWarehouse)) {
             ShelveTier shelveTier = tierService.getShelveTier(productWarehouse.warehouseId(), productWarehouse.shelfNumber(), productWarehouse.tierNumber());
-            double volume = product.getDimensions().getVolume()* productWarehouse.amount();
-            shelveTier.addOccupiedVolume(volume);
+            if(shelveTier.isSize()){
+                double volume = product.getDimensions().getVolume()* productWarehouse.amount();
+                shelveTier.addOccupiedVolume(volume);   
+            }
             return shelveTier;
         }
         else {
@@ -239,6 +244,23 @@ private final StorageService storageService =  new FileSystemStorageService();
         productWarehouseService. removeProductWarehousesByProductIds(deleteProductsDto.getProductIds());
         productWarehouseService.removeProductWarehouses(deleteProductsDto.getProductWarehouseIds());
         productRepository.deleteProductsById(deleteProductsDto.getProductIds());
+    }
+
+    public Page<RowWithProducts> getProductByTier(UUID warehouseId, Pageable pageable) {
+        workerWarehouseService.validateWorkerWarehouseRelation(warehouseId);
+        Page<Shelve> allShelves = shelveService.getShelvesFromWarehouse(warehouseId,  pageable);
+        Set<ShelveTier> tiers = allShelves.getContent().stream()
+                .flatMap(shelve -> shelve.getShelveTiers().stream())
+                .collect(Collectors.toSet());
+        List<ProductWarehouse> productWarehouses = productWarehouseRepository. findAllByTierIn(tiers);
+        Map<ShelveTier, List<Product>> groupedByTier = productWarehouses.stream()
+                .collect(Collectors.groupingBy(
+                        ProductWarehouse::getTier,
+                        Collectors.mapping(ProductWarehouse::getProduct, Collectors.toList())
+                ));
+
+        List<RowWithProducts> shelves= ProductMapper.toShelfWithProductsDtoList(groupedByTier, allShelves.getContent());
+        return new PageImpl<>(shelves, pageable, allShelves.getTotalElements());
     }
 
 //    @Transactional

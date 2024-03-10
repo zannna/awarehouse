@@ -9,15 +9,16 @@ import com.example.awarehouse.module.product.dto.*;
 import com.example.awarehouse.module.product.util.ImageUtils;
 import com.example.awarehouse.module.storage.FileSystemStorageService;
 import com.example.awarehouse.module.storage.StorageService;
+import com.example.awarehouse.module.warehouse.shelve.Shelve;
 import com.example.awarehouse.module.warehouse.shelve.mapper.DimensionsMapper;
+import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ProductMapper {
     private final StorageService storageService = new FileSystemStorageService();
@@ -117,6 +118,64 @@ public class ProductMapper {
                 .image(product.getImage())
                 .group(product.getGroup())
                 .build();
+    }
+    public static List<RowWithProducts> toShelfWithProductsDtoList(List<ProductWarehouse> productWarehouses,
+                                                                   List<ShelveTier> tiers){
+        Map<ShelveTier, List<Product>> groupedByTier = productWarehouses.stream()
+                .collect(Collectors.groupingBy(
+                        ProductWarehouse::getTier,
+                        Collectors.mapping(ProductWarehouse::getProduct, Collectors.toList())
+                ));
+        List<Shelve> shelves = tiers.stream().map(ShelveTier::getShelve).distinct().toList();
+        return toShelfWithProductsDtoList(groupedByTier, shelves);
+    }
+
+
+    public static List<RowWithProducts> toShelfWithProductsDtoList(Map<ShelveTier, List<Product>> groupedByTier,
+                                                                   List<Shelve> shelves) {
+        Map<Integer, List<ShelfWithProductsDto>> shelvesByRow = new HashMap<>();
+        for (Shelve shelve : shelves) {
+            List<TierWithProductsDto> tiers = toTierWithProductsDtoList(groupedByTier, shelve);
+            ShelfWithProductsDto shelfWithProductsDto = ShelfWithProductsDto.builder()
+                    .id(shelve.getId())
+                    .number(shelve.getNumber())
+                    .name(shelve.getName())
+                    .hasFreeSpace(shelve.hasFreeSpace())
+                    .tiers(tiers)
+                    .build();
+
+            shelvesByRow.computeIfAbsent(shelve.getRow(), k -> new ArrayList<>()).add(shelfWithProductsDto);
+        }
+
+        return shelvesByRow.entrySet().stream()
+                .map(entry -> new RowWithProducts(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+
+    private static List<TierWithProductsDto> toTierWithProductsDtoList(Map<ShelveTier, List<Product>> groupedByTier, Shelve shelve){
+        List<TierWithProductsDto> tierWithProductsDtos = new ArrayList<>();
+        for (ShelveTier tier : shelve.getShelveTiers()) {
+            List<Product> products = groupedByTier.get(tier);
+            TierWithProductsDto tierWithProductsDto = TierWithProductsDto.builder()
+                    .id(tier.getId())
+                    .number(tier.getNumber())
+                    .name(tier.getName())
+                    .occupiedVolume(tier.countOccupiedVolumePercentage())
+                    .products(ProductMapper.toProductInTierDto(products))
+                    .build();
+            tierWithProductsDtos.add(tierWithProductsDto);
+        }
+        return tierWithProductsDtos.stream().sorted(Comparator.comparingInt(TierWithProductsDto::getNumber)).collect(Collectors.toList());
+    }
+
+    private static List<ProductInTierDto> toProductInTierDto(List<Product> products) {
+        if(products == null || products.isEmpty()){
+            return new ArrayList<>();
+        }
+        return products.stream()
+                .map(product -> new ProductInTierDto(product.getId(), product.getTitle(), product.getAmount(), toStringPhoto(product.getPhotoFullName())))
+                .collect(Collectors.toList());
     }
 
 }

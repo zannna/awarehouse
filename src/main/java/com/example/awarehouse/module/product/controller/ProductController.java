@@ -16,10 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.example.awarehouse.util.Constants.*;
 
@@ -52,16 +49,15 @@ public class ProductController {
         return productService.createProduct(file,  productCreationDto);
     }
 
-    @GetMapping(URI_WAREHOUSE+"/{warehouseId}")
-    public ResponseEntity<Page<ProductDto>> getProductsFromWarehouse(@PathVariable UUID warehouseId, @PageableDefault Pageable pageable){
-        Page<ProductDto> products = productService.getProductsFromWarehouse(warehouseId, pageable);
-        return  ResponseEntity.status(HttpStatus.OK).body(products);
-    }
+//    @GetMapping(URI_WAREHOUSE+"/{warehouseId}")
+//    public ResponseEntity<Page<ProductDto>> getProductsFromWarehouse(@PathVariable UUID warehouseId, @PageableDefault Pageable pageable){
+//        Page<ProductDto> products = productService.getProductsFromWarehouse(warehouseId, pageable);
+//        return  ResponseEntity.status(HttpStatus.OK).body(products);
+//    }
 
     @PostMapping(URI_SEARCH)
     public ResponseEntity<Page<ProductDto>> getProductsFromWarehouses( @RequestBody FilterDto filterDto,
                                                                        @PageableDefault Pageable pageable) {
-
         Page<ProductDto> products = productService.getProductsFromWarehouses(filterDto, pageable);
         return  ResponseEntity.status(HttpStatus.OK).body(products);
     }
@@ -77,6 +73,13 @@ public class ProductController {
         productService.deleteProducts(deleteProductsDto);
         return  ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @GetMapping(URI_WAREHOUSE+"/{warehouseId}")
+    public ResponseEntity<Page<RowWithProducts>> getProductsByTier(@PathVariable UUID warehouseId, @PageableDefault Pageable pageable){
+        Page<RowWithProducts> products = productService.getProductByTier(warehouseId, pageable);
+        return  ResponseEntity.status(HttpStatus.OK).body(products);
+    }
+
 
 
 }

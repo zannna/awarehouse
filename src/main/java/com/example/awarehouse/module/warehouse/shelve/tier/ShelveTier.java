@@ -4,6 +4,7 @@ package com.example.awarehouse.module.warehouse.shelve.tier;
 import com.example.awarehouse.module.warehouse.shelve.Dimensions;
 import com.example.awarehouse.module.warehouse.shelve.Shelve;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "tier")
 @NoArgsConstructor
+@EqualsAndHashCode
 @Getter
 public class ShelveTier {
     @Id
@@ -49,5 +51,16 @@ public class ShelveTier {
 
     public void removeOccupiedVolume(double volume) {
         this.occupiedVolume -= volume;
+    }
+
+    public boolean hasFreeSpace() {
+        return this.occupiedVolume < this.dimensions.getVolume();
+    }
+
+    public  double countOccupiedVolumePercentage(){
+        if(size) {
+            return (occupiedVolume / dimensions.getVolume()) * 100;
+        }
+        return 0;
     }
 }

@@ -21,4 +21,5 @@ public class ShelveTierController {
         shelveTierService.removeShelfTier(tierId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
 }

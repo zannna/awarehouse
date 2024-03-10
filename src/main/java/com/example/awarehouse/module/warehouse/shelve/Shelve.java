@@ -50,4 +50,16 @@ public class Shelve {
         this.warehouse = warehouse;
         this.row = row;
     }
+    public Boolean hasFreeSpace() {
+        Boolean response = false;
+        for (ShelveTier tier : shelveTiers) {
+            if(!tier.isSize()){
+                response= null;
+            }
+            else if (tier.hasFreeSpace()) {
+                return true;
+            }
+        }
+        return response;
+    }
 }

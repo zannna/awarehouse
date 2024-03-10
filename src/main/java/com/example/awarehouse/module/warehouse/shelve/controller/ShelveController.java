@@ -1,11 +1,12 @@
 package com.example.awarehouse.module.warehouse.shelve.controller;
 
 import com.example.awarehouse.module.product.dto.ProductFreePlaceDto;
+import com.example.awarehouse.module.product.dto.RowWithProducts;
 import com.example.awarehouse.module.warehouse.shelve.ShelveService;
-import com.example.awarehouse.module.warehouse.shelve.dto.FreeShelveDto;
 import com.example.awarehouse.module.warehouse.shelve.dto.ShelfCreationDto;
 import com.example.awarehouse.module.warehouse.shelve.dto.ShelveDto;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +32,8 @@ public class ShelveController {
         return ResponseEntity.status(HttpStatus.OK).body(shelveService.getShelves(warehouseId));
     }
 
-    @GetMapping(URI_FREE_PLACE)
-    public List<FreeShelveDto> findFreePlaceForProduct(@RequestBody ProductFreePlaceDto freePlaceDto) {
+    @PostMapping(URI_FREE_PLACE)
+    public Page<RowWithProducts> findFreePlaceForProduct(@RequestBody ProductFreePlaceDto freePlaceDto) {
         return shelveService.findFreePlaceForProduct(freePlaceDto);
     }
 
@@ -41,5 +42,6 @@ public class ShelveController {
         shelveService.removeShelve(shelveId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
 
 }

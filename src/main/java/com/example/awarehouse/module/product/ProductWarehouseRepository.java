@@ -1,7 +1,6 @@
 package com.example.awarehouse.module.product;
 
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
-import io.micrometer.observation.ObservationFilter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -14,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -36,4 +36,8 @@ interface ProductWarehouseRepository extends JpaRepository<ProductWarehouse, UUI
     void setTier(ShelveTier tier, UUID tierId);
 
     List<ProductWarehouse> findAllByProductIdIn(List<UUID> productIds);
+
+    List<ProductWarehouse> findAllByTierIn(List<ShelveTier> tiers);
+
+    List<ProductWarehouse> findAllByTierIn(Set<ShelveTier> tiers);
 }

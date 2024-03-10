@@ -1,6 +1,9 @@
 package com.example.awarehouse.module.warehouse.shelve;
 
+import com.example.awarehouse.module.product.ProductWarehouseService;
 import com.example.awarehouse.module.product.dto.ProductFreePlaceDto;
+import com.example.awarehouse.module.product.dto.RowWithProducts;
+import com.example.awarehouse.module.product.dto.ShelfWithProductsDto;
 import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.WarehouseService;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
@@ -11,9 +14,13 @@ import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
 import com.example.awarehouse.util.UserIdSupplier;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -25,6 +32,7 @@ public class ShelveService {
     private final WorkerWarehouseService workerWarehouseService;
     private final UserIdSupplier workerIdSupplier;
     private final ShelveTierService shelveTierService;
+    private final ProductWarehouseService productWarehouseService;
 
     public ShelveDto createShelve(UUID warehouseId, ShelfCreationDto shelveDto) {
         workerWarehouseService.validateWorkerWarehouseRelation(  workerIdSupplier.getUserId(), warehouseId);
@@ -94,16 +102,21 @@ public class ShelveService {
         return ShelveMapper.toShelveDtos(shelves);
     }
 
-    public List<FreeShelveDto> findFreePlaceForProduct(ProductFreePlaceDto freePlaceDto) {
+    public Page<RowWithProducts> findFreePlaceForProduct(ProductFreePlaceDto freePlaceDto) {
         workerWarehouseService.validateWorkerWarehouseRelation(freePlaceDto.warehouseIds());
         double volume = freePlaceDto.amount()*freePlaceDto.height()*freePlaceDto.length()*freePlaceDto.width();
         List<ShelveTier> tiers = shelveTierService.findFreePlace(volume, freePlaceDto.warehouseIds());
-        return ShelveMapper.toFreeShelveDto(tiers);
+        List<RowWithProducts> shelfWithProductsDtos = productWarehouseService.getShelfWithProducts(tiers);
+        return  new PageImpl<>(shelfWithProductsDtos, Pageable.unpaged(), shelfWithProductsDtos.size());
     }
 
     public void removeShelve(UUID shelveId) {
         Shelve shelve = shelveRepository.findById(shelveId).orElseThrow(() -> new IllegalArgumentException("Shelve with id " + shelveId + " does not exist"));
         shelveTierService.removeShelfTiers(shelve.getShelveTiers());
         shelveRepository.deleteById(shelve.getId());
+    }
+
+    public Page<Shelve> getShelvesFromWarehouse(UUID warehouseId, Pageable  pageable) {
+        return shelveRepository.findAllByWarehouseIdOrderByRowAscNumberAsc(warehouseId, pageable);
     }
 }

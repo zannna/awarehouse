@@ -1,6 +1,9 @@
 package com.example.awarehouse.module.product;
 
 import com.example.awarehouse.module.product.dto.MoveProductsDto;
+import com.example.awarehouse.module.product.dto.RowWithProducts;
+import com.example.awarehouse.module.product.dto.ShelfWithProductsDto;
+import com.example.awarehouse.module.product.mapper.ProductMapper;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -68,4 +71,8 @@ public class ProductWarehouseService {
         productWarehouseRepository.deleteAll(productWarehouses);
     }
 
+    public  List<RowWithProducts> getShelfWithProducts(List<ShelveTier> tiers) {
+        List<ProductWarehouse> productWarehouses= productWarehouseRepository.findAllByTierIn(tiers);
+        return ProductMapper.toShelfWithProductsDtoList( productWarehouses, tiers);
+    }
 }

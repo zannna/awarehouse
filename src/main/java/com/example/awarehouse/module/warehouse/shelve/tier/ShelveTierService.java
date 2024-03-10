@@ -39,4 +39,9 @@ public class ShelveTierService {
     public void removeShelfTiers(Set<ShelveTier> shelveTiers) {
         shelveTiers.forEach(tier -> removeShelfTier(tier.getId()));
     }
+
+    public List<ShelveTier> getAllTiersByWarehouseId(UUID warehouseId) {
+       return shelveTierRepository.findByShelveWarehouseIdOrderByShelveIdAscNumberAsc(warehouseId);
+
+    }
 }
