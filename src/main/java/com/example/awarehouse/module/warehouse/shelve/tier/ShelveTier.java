@@ -4,6 +4,7 @@ package com.example.awarehouse.module.warehouse.shelve.tier;
 import com.example.awarehouse.module.warehouse.shelve.Dimensions;
 import com.example.awarehouse.module.warehouse.shelve.Shelve;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,8 +30,16 @@ public class ShelveTier {
     @ManyToOne
     @JoinColumn(name = "shelve_id")
     private Shelve shelve;
-    private double occupiedVolume =0;
+    @EqualsAndHashCode.Exclude private double occupiedVolume =0;
     public ShelveTier(int number, String name, boolean size, Dimensions dimensions) {
+        this.number = number;
+        this.name = name;
+        this.size = size;
+        this.dimensions = dimensions;
+    }
+
+    public ShelveTier(UUID id, int number, String name, boolean size, Dimensions dimensions) {
+        this.id = id;
         this.number = number;
         this.name = name;
         this.size = size;
@@ -62,5 +71,12 @@ public class ShelveTier {
             return (occupiedVolume / dimensions.getVolume()) * 100;
         }
         return 0;
+    }
+
+    public ShelveTier updateTier(ShelveTier updateTier) {
+        this.name = updateTier.getName();
+        this.size = updateTier.isSize();
+        this.dimensions = updateTier.getDimensions();
+        return this;
     }
 }

@@ -44,4 +44,8 @@ public class ShelveTierService {
        return shelveTierRepository.findByShelveWarehouseIdOrderByShelveIdAscNumberAsc(warehouseId);
 
     }
+
+    public ShelveTier saveShelfTier(ShelveTier updateTier) {
+        return shelveTierRepository.save(updateTier);
+    }
 }

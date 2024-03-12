@@ -19,4 +19,7 @@ interface ProductRepository extends JpaRepository< Product, UUID> {
     @Transactional
     @Query("DELETE FROM Product p WHERE p.id IN :productIds")
     void deleteProductsById(List<UUID> productIds);
+
+    @Query("SELECT p FROM Product p WHERE p.group.id IN :groupIds")
+    List<Product> findProductsWithOnlyGroup(List<UUID> groupIds);
 }

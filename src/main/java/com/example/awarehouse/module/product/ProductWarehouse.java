@@ -47,5 +47,9 @@ public class ProductWarehouse {
         this.tier =tier;
     }
 
+    public void setNumberOfProducts(double numberOfProducts) {
+        this.numberOfProducts = numberOfProducts;
+    }
+
 
 }

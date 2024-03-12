@@ -16,7 +16,7 @@ public class ProductDto {
 
     private UUID id;
     private String title;
-    private double amount;
+    private double amountGroup;
     private PriceDto price;
     private BasicGroupInfoDto group;
     private List<ProductWarehouseDto> productWarehouses;

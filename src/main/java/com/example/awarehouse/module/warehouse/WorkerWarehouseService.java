@@ -1,6 +1,7 @@
 package com.example.awarehouse.module.warehouse;
 
 import com.example.awarehouse.module.administration.dto.AdminWorkersDto;
+import com.example.awarehouse.module.product.ProductWarehouse;
 import com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto;
 import com.example.awarehouse.module.warehouse.dto.GroupWarehouseDto;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WorkerWarehouseRelationNotExist;
@@ -30,6 +31,15 @@ public class WorkerWarehouseService {
         return workerWarehouseRepository.findWorkerWarehouses(workerId);
     }
 
+    public boolean validateWorkerWarehouseRelation(ProductWarehouse productWarehouse){
+        UUID workerId = workerIdSupplier.getUserId();
+        return productWarehouse
+                .getWarehouse()
+                .getWorkerWarehouses()
+                .stream()
+                .anyMatch(workerWarehouse -> workerWarehouse.getWorker().getId().equals(workerId));
+    }
+
     public void validateWorkerWarehouseRelation(List<UUID> warehouseIds){
         UUID workerId = workerIdSupplier.getUserId();
         for (UUID warehouseId: warehouseIds) {
@@ -46,6 +56,11 @@ public class WorkerWarehouseService {
             throw new WorkerWarehouseRelationNotExist("Worker with id "+workerId+" does not have relation with warehouse with id "+warehouseId);
         }
 
+    }
+    public boolean isWorkerWithAnyConnected(Set<UUID> warehouseIds){
+        UUID workerId = workerIdSupplier.getUserId();
+        List<WorkerWarehouse> workerWarehouses =workerWarehouseRepository. findByWorkerIdAndWarehouseIdIn(workerId, warehouseIds);
+        return !workerWarehouses.isEmpty();
     }
 
     public List<GroupWarehouseDto> getWarehouseGroups(UUID warehouseId, UUID workerId){

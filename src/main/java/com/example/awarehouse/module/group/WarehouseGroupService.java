@@ -180,4 +180,14 @@ public class WarehouseGroupService {
     public void deleteGroups(List<GroupWorker> groupWorkers) {
         groupWorkerRepository.deleteAllByIdInBatch(groupWorkers.stream().map(GroupWorker::getId).collect(Collectors.toList()));
     }
+
+    public boolean isWorkerWithGroupConnected(WarehouseGroup group){
+        UUID workerId = workerIdSupplier.getUserId();
+        return group.getGroupWorker().stream().anyMatch((gw)->gw.getWorker().getId().equals(workerId));
+    }
+
+    public boolean isWorkerWithGroupConnected(UUID groupId){
+        UUID workerId = workerIdSupplier.getUserId();
+        return groupWorkerRepository.findByGroupIdAndWorkerId(groupId, workerId).isPresent();
+    }
 }

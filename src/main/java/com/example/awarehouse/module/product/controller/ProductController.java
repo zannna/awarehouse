@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import static com.example.awarehouse.util.Constants.*;
+import static org.springframework.web.bind.annotation.RequestMethod.PATCH;
 
 @RestController
 @RequestMapping(URI_VERSION_V1+URI_PRODUCT)
@@ -63,9 +65,15 @@ public class ProductController {
     }
 
     @PatchMapping( URI_MOVE )
-    public  ResponseEntity<HttpStatus> modifyProduct(@RequestBody MoveProductsDto moveProductsDto) {
+    public  ResponseEntity<HttpStatus> moveProduct(@RequestBody MoveProductsDto moveProductsDto) {
         productService.moveProducts(moveProductsDto);
         return  ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @RequestMapping(path = "/", method = PATCH, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ProductDto> updateProduct(@RequestPart("product") ProductDto product, @RequestPart(name = "file", required = false) MultipartFile file) {
+        ProductDto productResponse = productService.updateProduct(product, file);
+        return ResponseEntity.status(HttpStatus.OK).body(productResponse);
     }
 
     @DeleteMapping

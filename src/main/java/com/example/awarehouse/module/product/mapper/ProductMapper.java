@@ -37,10 +37,11 @@ public class ProductMapper {
         return ProductDto.builder()
                 .id(product.getId())
                 .title(product.getTitle())
-                .amount(product.getAmount())
+                .amountGroup(product.getAmount())
                 .price(toPriceDto(product.getPrice()))
                 .image(toStringPhoto(product.getPhotoFullName()))
                 .group(WarehouseGroupMapper.toDto(product.getGroup()))
+                .dimensions(DimensionsMapper.toDto(product.getDimensions()))
                 .build();
     }
 
@@ -113,7 +114,7 @@ public class ProductMapper {
         return ProductDto.builder()
                 .id(product.getId())
                 .title(product.getTitle())
-                .amount(product.getAmount())
+                .amountGroup(product.getAmountGroup())
                 .price(product.getPrice())
                 .image(product.getImage())
                 .group(product.getGroup())

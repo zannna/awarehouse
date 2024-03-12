@@ -27,6 +27,11 @@ public class ShelveController {
         return ResponseEntity.status(HttpStatus.OK).body(shelveService.createShelve(warehouseId, shelveDto));
     }
 
+    @PutMapping
+    public ResponseEntity<ShelveDto> updateShelve(@PathVariable UUID warehouseId, @RequestBody ShelveDto shelveDto) {
+        return ResponseEntity.status(HttpStatus.OK).body(shelveService.updateShelf(warehouseId, shelveDto));
+    }
+
     @GetMapping
     public ResponseEntity<List<ShelveDto>> getWarehouseInventory(@PathVariable UUID warehouseId) {
         return ResponseEntity.status(HttpStatus.OK).body(shelveService.getShelves(warehouseId));

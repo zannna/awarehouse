@@ -33,4 +33,15 @@ public class FileSystemStorageService implements StorageService {
             throw new StorageException("Failed to store file.", e);
         }
     }
+    public void delete(String fileName) {
+        try {
+            Path file = rootLocation.resolve(fileName);
+            boolean deleted = Files.deleteIfExists(file);
+            if (!deleted) {
+                throw new StorageException("Failed to delete non-existent file.");
+            }
+        } catch (IOException e) {
+            throw new StorageException("Failed to delete file.", e);
+        }
+    }
 }

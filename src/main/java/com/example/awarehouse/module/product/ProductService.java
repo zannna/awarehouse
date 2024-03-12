@@ -12,6 +12,7 @@ import com.example.awarehouse.module.warehouse.WarehouseService;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
 import com.example.awarehouse.module.warehouse.shelve.Shelve;
 import com.example.awarehouse.module.warehouse.shelve.ShelveService;
+import com.example.awarehouse.module.warehouse.shelve.mapper.DimensionsMapper;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
@@ -55,9 +56,11 @@ private ShelveService shelveService;
         return ProductMapper.toDto(savedProduct, productWarehouses);
     }
     void saveFile(MultipartFile file, Product savedProduct) {
-        String newFileName = file.getOriginalFilename()+"_"+savedProduct.getId();
-        savedProduct.setPhoto(file.getOriginalFilename());
-        storageService.store(file, newFileName);
+        if(file!=null && !file.isEmpty()) {
+            String newFileName = file.getOriginalFilename() + "_" + savedProduct.getId();
+            savedProduct.setPhoto(file.getOriginalFilename());
+            storageService.store(file, newFileName);
+        }
     }
     private Product product(ProductCreationDto productDto) {
         checkIfWarehouseIdAndGroupIdNotNull(productDto);
@@ -157,7 +160,9 @@ private ShelveService shelveService;
                 .where(ProductWarehouseSpecification.orderBy(sortConditions))
                 .and(ProductWarehouseSpecification.containsLike(searchConditions))
                 .and(ProductWarehouseSpecification.hasWarehouseIn(filterDto.getWarehouseIds()));
+
         Page<ProductDto> productPage = productWarehouseRepository.findAll(spec, pageable).map(ProductMapper::toDto);
+        productRepository.findProductsWithOnlyGroup( filterDto.getGroupIds());
         if(addingProductsWithOnlyGroupIsRequired(filterDto)){
             List<ProductDto> products = addProductsWithOnlyGroup( productPage, sortConditions);
             return new PageImpl<>(
@@ -202,30 +207,6 @@ private ShelveService shelveService;
         return products;
     }
 
-//    private List<ProductDto> convertToProductDtoList(List<ProductWarehouse> productsPage) {
-//        Iterator<ProductWarehouse> iterator = productsPage.iterator();
-//        List<ProductDto> products = new ArrayList<>();
-//        while (!productsPage.isEmpty()) {
-//            ProductWarehouse productWarehouse = iterator.next();
-//            ProductDto product = ProductMapper.toDto(productWarehouse);
-//            products.add(product);
-//            iterator.remove();
-//            findOtherProductWarehouses(iterator, product, products);
-//            iterator = productsPage.iterator();
-//        }
-//        return products;
-//    }
-
-//    private void findOtherProductWarehouses(Iterator<ProductWarehouse> iterator, ProductDto productDto, List<ProductDto> products) {
-//        while (iterator.hasNext()) {
-//            ProductWarehouse next = iterator.next();
-//            if (next.getProduct().getId().equals(productDto.getId())) {
-//                productDto.getProductWarehouses().add(ProductWarehouseMapper.toDto(next));
-//                iterator.remove();
-//            }
-//        }
-//    }
-
     public List<Product> findProductUnderstockByGroupId(UUID groupId) {
         return productRepository.findUnderstockByGroup(groupId);
     }
@@ -263,57 +244,81 @@ private ShelveService shelveService;
         return new PageImpl<>(shelves, pageable, allShelves.getTotalElements());
     }
 
-//    @Transactional
-//    public ProductDto modifyProduct(ProductDto productDto) {
-//        Product product = productRepository.findById(productDto.getId()).orElseThrow(()-> new ProductNotExistException("Product with id "+productDto.getId()+" not exist"));
-//        product.setTitle(productDto.getTitle());
-//        product.setPrice(ProductMapper.toPrice(productDto.getPrice()));
-//        product.setPhoto(productDto.getPhoto());
-//        List<ProductWarehouse> newProductWarehouses = new ArrayList<>();
-//        for(ProductWarehouseDto productWarehouse : productDto.getProductWarehouses()){
-//            if(productWarehouse.productWarehouseId()==null)
-//            {
-//                ProductWarehouse newProductWarehouse = createProductWarehouseAssociation(ProductWarehouseCreationDto.builder()
-//                        .warehouseId(productWarehouse.warehouseId())
-//                        .amount(productWarehouse.amount())
-//                        .shelfNumber(productWarehouse.shelfNumber())
-//                        .tierNumber(productWarehouse.tierNumber())
-//                        .build(), product);
-//                newProductWarehouses.add(newProductWarehouse);
-//            }
-//        }
-//      //  List<UUID> productwarehousesIds = productDto.getProductWarehouses().stream().map(ProductWarehouseDto::productWarehouseId).collect(Collectors.toList());
-//     //   List<ProductWarehouse> toSetProductWarehouses = productWarehouseRepository.findAllById(productwarehousesIds);
-////       if(productDto.getProductWarehouses().size() != toSetProductWarehouses.size()){
-////           for(UUID id: productwarehousesIds){
-////               if(!toSetProductWarehouses.contains(id)){
-////                   toSetProductWarehouses.add()
-////               }
-////           }
-////       }
-////
-////        Set<ProductWarehouse> actualProductWarehouses = product.getProductWarehouses();
-////        for(ProductWarehouse pw:  toSetProductWarehouses){
-////            if(!actualProductWarehouses.contains(pw)){
-////
-////                productWarehouseRepository.save()
-////            }
-////        }
-//        if(volumeDiffer(product, productDto)){
-//                }
-//        product.setDimensions(DimensionsMapper.toDimensions(productDto.getDimensionsDto()));
-//        product.setAmount(productDto.getAmount());
-//        product.setGroup(warehouseGroupService.getGroup(productDto.getGroup().getId()).orElse(null));
-//
-//        productRepository.save(product);
-//        return productDto;
-//    }
+    @Transactional
+    public ProductDto updateProduct(ProductDto productDto, MultipartFile file) {
+        Product product = productRepository.findById(productDto.getId()).orElseThrow(()-> new IllegalArgumentException("Product with id "+productDto.getId()+" not exist"));
+        Optional<ProductWarehouse> optionalProductWarehouse = product
+                .getProductWarehouses()
+                .stream()
+                .filter(pw->pw.getId().equals(productDto.getProductWarehouses().get(0).productWarehouseId()))
+                .findFirst();
+        verifyIfWorkerCanChangeProduct(product, productDto, optionalProductWarehouse);
+        changeDataAssociateWithProductWarehouse( optionalProductWarehouse, product, productDto);
+        if(productDto.getGroup()!=null && productDto.getGroup().id()!=product.getGroup().getId()){
+            changeGroup(productDto, product);
+        }
+        product.setTitle(productDto.getTitle());
+        product.setPrice(ProductMapper.toPrice(productDto.getPrice()));
+        changePhoto(file, product);
+        ProductWarehouse productWarehouse = optionalProductWarehouse.orElse(null);
+        productRepository.save(product);
+      return ProductMapper.toDto(product, List.of(ProductWarehouseMapper.toDto(productWarehouse)));
 
-//    private boolean volumeDiffer(Product product, ProductDto productDto){
-//        DimensionsDto dimensionsDto= productDto.getDimensionsDto();
-//        double productVolume= product.getDimensions().getVolume() * product.getAmount();
-//        double dtoVolume = dimensionsDto.height()*dimensionsDto.length()*dimensionsDto.width() * productDto.getAmount();
-//        return productVolume != dtoVolume;
-//    }
+    }
+    private void verifyIfWorkerCanChangeProduct(Product product, ProductDto productDto, Optional<ProductWarehouse> optionalProductWarehouse){
+        boolean isWorkerConnectedWithGroup = true;
+        if(product.getGroup()!=null) {
+             isWorkerConnectedWithGroup = warehouseGroupService.isWorkerWithGroupConnected(product.getGroup());
+        }
+        boolean isWithWarehouseConnected = optionalProductWarehouse.isPresent();
+        if(isWithWarehouseConnected) {
+            isWithWarehouseConnected = workerWarehouseService.validateWorkerWarehouseRelation(optionalProductWarehouse.get());
+        }
+        if(!isWithWarehouseConnected && !isWorkerConnectedWithGroup){
+            throw new IllegalArgumentException("Worker is not connected with group and warehouse");
+        }
+    }
+    private void changeDataAssociateWithProductWarehouse(Optional<ProductWarehouse>  optionalProductWarehouse, Product product, ProductDto productDto){
+        ProductWarehouse productWarehouse = optionalProductWarehouse.orElse(null);
+        if( productWarehouse!=null) {
+            double oldVolume = product.getDimensions().getVolume() * productWarehouse.getNumberOfProducts();
+            double newVolume = productDto.getDimensions().height() * productDto.getDimensions().length() * productDto.getDimensions().width() *
+                    productDto.getAmountGroup();
+            if(oldVolume!=newVolume) {
+                productWarehouse.getTier().addOccupiedVolume(newVolume - oldVolume);
+            }
+            product.setDimensions(DimensionsMapper.toDimensions(productDto.getDimensions()));
+            product.setAmount(product.getAmount()+productDto.getAmountGroup()-productWarehouse.getNumberOfProducts());
+            productWarehouse.setNumberOfProducts(productDto.getAmountGroup());
+            productWarehouseRepository.save(productWarehouse);
+        }
+        else {
+            product.setDimensions(DimensionsMapper.toDimensions(productDto.getDimensions()));
+            product.setAmount(productDto.getAmountGroup());
+        }
+    }
+
+    private void changeGroup(ProductDto productDto, Product product){
+        WarehouseGroup group =warehouseGroupService.getGroup(productDto.getGroup().id()).orElseThrow(()-> new IllegalArgumentException("Group with id "+productDto.getGroup().id()+" not exist"));
+        boolean isWithNewGroupConnected = warehouseGroupService.isWorkerWithGroupConnected(group);
+        if(!isWithNewGroupConnected){
+            throw new IllegalArgumentException("Worker is not connected with group");
+        }
+        product.setGroup(group);
+    }
+    private  void changePhoto(MultipartFile file, Product product){
+        if(file!=null && !file.isEmpty()){
+            saveFile(file, product);
+        }
+        else if(product.getPhoto()==null) {
+            storageService.delete(product.getPhotoFullName());
+        }
+    }
+    boolean isOpacityChanged(ProductDto productDto, Product product){
+        double newVolume = productDto.getDimensions().height()*productDto.getDimensions().length()*productDto.getDimensions().width();
+        return newVolume != product.getDimensions().getVolume();
+    }
+
+
 }
 

@@ -17,12 +17,18 @@ import java.util.stream.Collectors;
 
 public class ShelveTierMapper {
 
-    public static Set<ShelveTier> toTierSet(List<ShelveTierCreationDto> tierDtos, LengthUnit unit){
+    public static Set<ShelveTier> toTierCreationSet(List<ShelveTierCreationDto> tierDtos, LengthUnit unit){
         return tierDtos.stream().map((t)->toTier(t, unit)).collect(Collectors.toSet());
     }
+        public  static Set<ShelveTier> toTierSet(List<ShelveTierDto> tierDtos, LengthUnit unit){
+        return tierDtos.stream().map((t)->toTier(t, unit)).collect(Collectors.toSet());
+    }
+    public static ShelveTier toTier(ShelveTierDto tierDto, LengthUnit lengthUnit) {
+        Dimensions dimensions = DimensionsMapper.toDimensions(tierDto.getDimensions(),lengthUnit);
+        return new ShelveTier(tierDto.getId(), tierDto.getNumber(), tierDto.getName(), tierDto.isSize(), dimensions);
+    }
 
-    public static ShelveTier toTier(ShelveTierCreationDto tierDto, LengthUnit lengthUnit) {
-        MetricConverter metricConverter = MetricConverterProvider.getConverter(lengthUnit);
+    public static ShelveTier toTier(ShelveTierCreationDto tierDto, LengthUnit lengthUnit) {;
         Dimensions dimensions = DimensionsMapper.toDimensions(tierDto.getDimensions(),lengthUnit);
         return new ShelveTier(tierDto.getNumber(), tierDto.getName(), tierDto.isSize(), dimensions);
     }

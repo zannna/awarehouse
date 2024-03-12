@@ -13,16 +13,15 @@ import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
 import com.example.awarehouse.util.UserIdSupplier;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -119,4 +118,38 @@ public class ShelveService {
     public Page<Shelve> getShelvesFromWarehouse(UUID warehouseId, Pageable  pageable) {
         return shelveRepository.findAllByWarehouseIdOrderByRowAscNumberAsc(warehouseId, pageable);
     }
+
+    @Transactional
+    public ShelveDto updateShelf(UUID warehouseId, ShelveDto shelveDto) {
+        workerWarehouseService.validateWorkerWarehouseRelation(workerIdSupplier.getUserId(), warehouseId);
+        Shelve shelve = shelveRepository.findById(shelveDto.getId()).orElseThrow(() -> new IllegalArgumentException("Shelve with id " + shelveDto.getId() + " does not exist"));
+        Shelve updatedShelve = ShelveMapper.toShelve(shelveDto, shelve.getWarehouse());
+        shelve.modifyShelve(updatedShelve);
+        updateTiers(shelve, updatedShelve);
+        return ShelveMapper.toShelveDto(shelve);
+    }
+    public void updateTiers(Shelve shelve, Shelve updatedShelve){
+        Set<ShelveTier> tiers = shelve.getShelveTiers();
+        Set<ShelveTier> updatedTiers =  updatedShelve.getShelveTiers();
+        removeTiers(tiers, updatedTiers);
+        for (ShelveTier updateTier : updatedTiers) {
+            ShelveTier existingTier = tiers.stream()
+                    .filter(t -> t.getId().equals(updateTier.getId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (existingTier != null) {
+                existingTier.updateTier(updateTier);
+            } else {
+                updateTier.setShelve(shelve);
+                shelveTierService.saveShelfTier(updateTier);
+            }
+        }
+    }
+
+    private void removeTiers(Set<ShelveTier> existingTiers, Set<ShelveTier> updatedTiers){
+        Set<UUID> updatedTiersIds = updatedTiers.stream().map(ShelveTier::getId).collect(Collectors.toSet());
+        existingTiers.stream().map(ShelveTier::getId).filter(tier -> !updatedTiersIds.contains(tier)).forEach(shelveTierService::removeShelfTier);
+    }
+
 }

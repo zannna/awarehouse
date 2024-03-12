@@ -35,4 +35,6 @@ public interface WorkerWarehouseRepository extends JpaRepository<WorkerWarehouse
             "AND ww.worker.id = :workerId")
      List<GroupWarehouseDto> findWorkerWarehousesWithGroups(UUID warehouseId, UUID workerId);
 
+    List<WorkerWarehouse> findByWorkerIdAndWarehouseIdIn(UUID workerId, Set<UUID> warehouseIds);
+
 }

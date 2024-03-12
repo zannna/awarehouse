@@ -62,4 +62,13 @@ public class Shelve {
         }
         return response;
     }
+
+    public void modifyShelve(Shelve shelve){
+        this.number = shelve.getNumber();
+        this.name = shelve.getName();
+        this.dimensions = shelve.getDimensions();
+        this.size = shelve.isSize();
+        this.warehouse = shelve.getWarehouse();
+        this.row = shelve.getRow();
+    }
 }

@@ -57,6 +57,8 @@ public class Product {
         return productWarehouses;
     }
     public String getPhotoFullName(){
+        if(photo==null)
+            return null;
         return photo+"_"+id;
     }
 

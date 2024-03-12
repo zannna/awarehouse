@@ -12,10 +12,15 @@ public class ShelveMapper {
 
     public static Shelve toShelve(ShelfCreationDto shelveDto, Warehouse warehouse) {
         Dimensions dimensions =DimensionsMapper.toDimensions(shelveDto.getDimensions(), warehouse.getUnit());
-        Set<ShelveTier> tiers = ShelveTierMapper.toTierSet(shelveDto.getTiers(), warehouse.getUnit());
+        Set<ShelveTier> tiers = ShelveTierMapper.toTierCreationSet(shelveDto.getTiers(), warehouse.getUnit());
         return new Shelve(shelveDto.getNumber(), shelveDto.getName(),  dimensions, shelveDto.isSize(), tiers, warehouse, shelveDto.getRow());
     }
 
+    public static  Shelve toShelve(ShelveDto shelveDto, Warehouse warehouse){
+        Dimensions dimensions =DimensionsMapper.toDimensions(shelveDto.getDimensions(), warehouse.getUnit());
+        Set<ShelveTier> tiers = ShelveTierMapper.toTierSet(shelveDto.getTiers(), warehouse.getUnit());
+        return new Shelve(shelveDto.getId(), shelveDto.getNumber(), shelveDto.getName(), dimensions, shelveDto.isSize(), tiers, warehouse, shelveDto.getRow());
+    }
     public static ShelveDto toShelveDto(Shelve shelve) {
         DimensionsDto dimensions =DimensionsMapper.toDto(shelve.getDimensions());
        List<ShelveTierDto> tiers = ShelveTierMapper.toTierDtoList(shelve.getShelveTiers());
