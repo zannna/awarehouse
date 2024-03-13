@@ -60,66 +60,9 @@ public class WarehouseGroupService {
     public Set<WarehouseGroup> getGroups(Set<UUID> groupsId) {
         return Optional.ofNullable(warehouseGroupRepository.findAllById(groupsId)).orElseGet(Collections::emptyList).stream().collect(Collectors.toSet());
     }
+
     public Optional<WarehouseGroup> getGroup(UUID groupId){
         return warehouseGroupRepository.findById(groupId);
-    }
-
-    public List<GroupWithWarehouses> getAllGroupsWithWarehouses() {
-        UUID workerId = workerIdSupplier.getUserId();
-        Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>> groupsWithWarehouses = getGroupsFromWorkerWarehouses(workerId);
-        addGroupsWhichAreNotAssociatedWithAnyWarehouses(groupsWithWarehouses, workerId);
-
-        return groupsWithWarehouses.entrySet().stream()
-                .map(entry -> new GroupWithWarehouses(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
-    }
-
-    public Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>> getGroupsFromWorkerWarehouses(UUID workerId){
-        Set<WorkerWarehouse> workerWarehouses = workerWarehouseService.getWorkerWarehouses(workerId);
-        Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>> groupsWithWarehouses = new HashMap<>();
-        for (WorkerWarehouse workerWarehouse: workerWarehouses) {
-            addWarehouseGroupsToGroupsWithWarehouses(groupsWithWarehouses, workerWarehouse.getWarehouse(), workerWarehouse.getRole().equals(Role.ADMIN));
-        }
-        return  groupsWithWarehouses;
-    }
-
-    private void addWarehouseGroupsToGroupsWithWarehouses(Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>> groupsWithWarehouses,
-                                                          Warehouse warehouse, Boolean isWarehouseAdmin){
-        UUID workerId =workerIdSupplier.getUserId();
-        Set<BasicGroupInfoDto> warehouseGroups = warehouse.getWarehouseGroups().stream()
-                .map((g)->new BasicGroupInfoDto(g.getId(), g.getName(), g.isAdministrator(workerId))).collect(Collectors.toSet());
-
-        for (BasicGroupInfoDto group : warehouseGroups) {
-            if(groupsWithWarehouses.containsKey(group)){
-                addWarehouseToGroupsWithWarehouses(groupsWithWarehouses, warehouse, group, isWarehouseAdmin);
-            }
-            else{
-                addGroupToGroupsWithWarehouses(groupsWithWarehouses, warehouse, group, isWarehouseAdmin);
-            }
-        }
-
-    }
-
-    private void addWarehouseToGroupsWithWarehouses(Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>> groupsWithWarehouses,
-                                                    Warehouse warehouse, BasicGroupInfoDto group, Boolean isWarehouseAdmin ){
-        groupsWithWarehouses.get(group).add(new BasicWarehouseInfoDto(warehouse.getId(), warehouse.getName(), isWarehouseAdmin));
-    }
-
-    private void addGroupToGroupsWithWarehouses(Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>> groupsWithWarehouses,
-                                                Warehouse warehouse, BasicGroupInfoDto group, Boolean isWarehouseAdmin){
-        List<BasicWarehouseInfoDto> warehouses= new ArrayList<>();
-        warehouses.add(new BasicWarehouseInfoDto(warehouse.getId(), warehouse.getName(), isWarehouseAdmin));
-        groupsWithWarehouses.put(group, warehouses);
-    }
-
-    private void addGroupsWhichAreNotAssociatedWithAnyWarehouses(Map<BasicGroupInfoDto, List<BasicWarehouseInfoDto>> groupsWithWarehouses, UUID workerId){
-        Set<WarehouseGroup> groups = warehouseGroupRepository.findByWorkerId(workerId);
-        for (WarehouseGroup group: groups) {
-            BasicGroupInfoDto groupDto = new BasicGroupInfoDto(group.getId(), group.getName(), true);
-            if(!groupsWithWarehouses.containsKey(groupDto)){
-                groupsWithWarehouses.put(groupDto, new ArrayList<>());
-            }
-        }
     }
 
 
@@ -186,8 +129,15 @@ public class WarehouseGroupService {
         return group.getGroupWorker().stream().anyMatch((gw)->gw.getWorker().getId().equals(workerId));
     }
 
-    public boolean isWorkerWithGroupConnected(UUID groupId){
+    public void validateWorkerGroupRelation(List<UUID> groupIds) {
         UUID workerId = workerIdSupplier.getUserId();
-        return groupWorkerRepository.findByGroupIdAndWorkerId(groupId, workerId).isPresent();
+        Set<UUID> groupIdsSet = new HashSet<>(groupIds);
+        List<GroupWorker> groupWorkers = groupWorkerRepository.findAllDistinctByWorkerIdAndGroupIdIn(workerId, groupIdsSet);
+        if(groupIdsSet.size()!=groupWorkers.size()){
+            throw new WorkerNotHaveAccess("Worker with id "+workerId+" does not have access to all groups");
+        }
+    }
+    public List<WarehouseGroup> getWorkerGroups(UUID workerId) {
+        return groupWorkerRepository.findWorkerGroups(workerId);
     }
 }

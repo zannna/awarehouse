@@ -21,4 +21,8 @@ public class WarehouseMapper {
         return new WarehouseResponseDto(warehouse.getId(), warehouse.getName(), warehouse.getUnit().name(), warehouse.getRowsNumber(), groups);
     }
 
+    public static BasicWarehouseInfoDto toBasicWarehouseInfoDto(Warehouse warehouse){
+        return new BasicWarehouseInfoDto(warehouse.getId(), warehouse.getName(), null);
+    }
+
 }

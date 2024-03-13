@@ -1,6 +1,6 @@
 package com.example.awarehouse.module.product.dto;
 
-public enum FilterField {
+public enum ProductWarehouseFilterField {
     ID("product.id", "uuid"),
     WAREHOUSE("warehouse.name", "string"),
     ROW("tier.shelve.row", "number"),
@@ -13,7 +13,7 @@ public enum FilterField {
     private final String path;
     private final String dataType;
 
-    FilterField(String path, String dataType) {
+    ProductWarehouseFilterField(String path, String dataType) {
         this.path = path;
         this.dataType = dataType;
     }
@@ -26,8 +26,8 @@ public enum FilterField {
         return this.dataType;
     }
 
-    public static FilterField fromString(String field) {
-        for (FilterField filterField : values()) {
+    public static ProductWarehouseFilterField fromString(String field) {
+        for (ProductWarehouseFilterField filterField : values()) {
             if (filterField.name().equalsIgnoreCase(field) || filterField.getPath().equalsIgnoreCase(field)) {
                 return filterField;
             }
@@ -35,7 +35,7 @@ public enum FilterField {
         throw new IllegalArgumentException("No constant with text " + field + " found");
     }
 
-    public static String toColumnPath(FilterField field) {
+    public static String toColumnPath(ProductWarehouseFilterField field) {
         return field.getPath();
     }
 }

@@ -1,16 +1,18 @@
 package com.example.awarehouse.module.product;
 
+import com.example.awarehouse.module.product.dto.ProductFilterField;
 import com.example.awarehouse.module.product.dto.ProductWarehouseFilterField;
 import com.example.awarehouse.module.product.dto.SortDirection;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class ProductWarehouseSpecification {
-    public static Specification<ProductWarehouse> containsLike(Map<ProductWarehouseFilterField, String> searchConditions) {
+public class ProductSpecification {
+    public static Specification<Product> containsLike(Map<ProductFilterField, String> searchConditions) {
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
             searchConditions.forEach((attributeName, value) -> {
@@ -27,12 +29,12 @@ public class ProductWarehouseSpecification {
         };
     }
 
-    public static Specification<ProductWarehouse> hasWarehouseIn(List<UUID> warehouseIds) {
-        return (root, query, criteriaBuilder) -> root.get("warehouse").get("id").in(warehouseIds);
+    public static Specification<Product> hasGroupIn(List<UUID> groupIds){
+        return (root, query, criteriaBuilder) -> root.get("group").get("id").in(groupIds);
     }
 
-    public static Specification<ProductWarehouse> orderBy(Map<ProductWarehouseFilterField, SortDirection> sortConditions) {
-        return (Root<ProductWarehouse> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> {
+    public static Specification<Product> orderBy(Map<ProductFilterField, SortDirection> sortConditions) {
+        return (Root<Product> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> {
             if (query.getResultType() != Long.class && query.getResultType() != long.class) {
                 List<Order> orders = new ArrayList<>();
 
@@ -55,7 +57,7 @@ public class ProductWarehouseSpecification {
         };
     }
 
-    private static Path<Object> resolvePath(Root<ProductWarehouse> root, String field) {
+    private static Path<Object> resolvePath(Root<Product> root, String field) {
         String[] parts = field.split("\\.");
         Path<Object> path = root.get(parts[0]);
         for (int i = 1; i < parts.length; i++) {

@@ -20,7 +20,6 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -145,14 +144,14 @@ private ShelveService shelveService;
     }
 
     public Page<ProductDto> getProductsFromWarehouses(FilterDto filterDto, Pageable pageable) {
-        Map<FilterField, SortDirection> sortConditions =  filterDto.getSortConditions().entrySet().stream()
+        Map<ProductWarehouseFilterField, SortDirection> sortConditions =  filterDto.getSortConditions().entrySet().stream()
                 .collect(Collectors.toMap(
-                        entry -> FilterField.fromString(entry.getKey()),
+                        entry -> ProductWarehouseFilterField.fromString(entry.getKey()),
                         entry -> SortDirection.fromString(entry.getValue())
                 ));
-        Map<FilterField, String> searchConditions =  filterDto.getSearchConditions().entrySet().stream()
+        Map<ProductWarehouseFilterField, String> searchConditions =  filterDto.getSearchConditions().entrySet().stream()
                 .collect(Collectors.toMap(
-                        entry -> FilterField.fromString(entry.getKey()),
+                        entry -> ProductWarehouseFilterField.fromString(entry.getKey()),
                         Map.Entry::getValue
                 ));
         workerWarehouseService.validateWorkerWarehouseRelation(filterDto.getWarehouseIds());
@@ -162,27 +161,14 @@ private ShelveService shelveService;
                 .and(ProductWarehouseSpecification.hasWarehouseIn(filterDto.getWarehouseIds()));
 
         Page<ProductDto> productPage = productWarehouseRepository.findAll(spec, pageable).map(ProductMapper::toDto);
-        productRepository.findProductsWithOnlyGroup( filterDto.getGroupIds());
-        if(addingProductsWithOnlyGroupIsRequired(filterDto)){
-            List<ProductDto> products = addProductsWithOnlyGroup( productPage, sortConditions);
-            return new PageImpl<>(
-                    products,
-                    PageRequest.of(
-                            productPage.getNumber(),
-                            productPage.getSize()),
-                    productPage.getTotalElements()
-            );
-        }
         return productPage;
     }
-    private boolean addingProductsWithOnlyGroupIsRequired(FilterDto filterDto){
-        return filterDto.getGroupIds()!=null && !filterDto.getGroupIds().isEmpty();
-    }
-    private List<ProductDto> addProductsWithOnlyGroup( Page<ProductDto> productPage, Map<FilterField, SortDirection> sortConditions){
+
+    private List<ProductDto> addProductsWithOnlyGroup( Page<ProductDto> productPage, Map<ProductWarehouseFilterField, SortDirection> sortConditions){
         Set<UUID> productIds= productPage.stream().map(ProductDto::getId).collect(Collectors.toSet());
         List<ProductDto> products= new ArrayList<>(productPage.getContent());
         ListIterator<ProductDto> iterator = products.listIterator();
-        if(sortConditions.get(FilterField.AMOUNT) == null || sortConditions.get(FilterField.AMOUNT).equals(SortDirection.ASC)){
+        if(sortConditions.get(ProductWarehouseFilterField.AMOUNT) == null || sortConditions.get(ProductWarehouseFilterField.AMOUNT).equals(SortDirection.ASC)){
             while (iterator.hasNext()) {
                 ProductDto current = iterator.next();
                 if ( productIds.contains(current.getId())) {
@@ -320,5 +306,25 @@ private ShelveService shelveService;
     }
 
 
+    public Page<ProductDto> getProductsByGroup(FilterDto filterDto, Pageable pageable) {
+        Map<ProductFilterField, SortDirection> sortConditions =  filterDto.getSortConditions().entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> ProductFilterField.fromString(entry.getKey()),
+                        entry -> SortDirection.fromString(entry.getValue())
+                ));
+        Map<ProductFilterField, String> searchConditions =  filterDto.getSearchConditions().entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> ProductFilterField.fromString(entry.getKey()),
+                        Map.Entry::getValue
+                ));
+        warehouseGroupService.validateWorkerGroupRelation(filterDto.getGroupIds());
+        Specification<Product> spec = Specification
+                .where(ProductSpecification.orderBy(sortConditions))
+                .and(ProductSpecification.containsLike(searchConditions))
+                .and(ProductSpecification.hasGroupIn(filterDto.getGroupIds()));
+
+        Page<ProductDto> productPage = productRepository.findAll(spec, pageable).map(ProductMapper::toDto);
+        return productPage;
+    }
 }
 

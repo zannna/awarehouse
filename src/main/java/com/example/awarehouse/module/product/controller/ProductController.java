@@ -88,6 +88,11 @@ public class ProductController {
         return  ResponseEntity.status(HttpStatus.OK).body(products);
     }
 
+    @PostMapping(URI_SEARCH+URI_GROUP)
+    public ResponseEntity<Page<ProductDto>> getProductsByGroup( @RequestBody FilterDto filterDto, @PageableDefault Pageable pageable){
+        Page<ProductDto> products = productService.getProductsByGroup(filterDto, pageable);
+        return  ResponseEntity.status(HttpStatus.OK).body(products);
+    }
 
 
 }

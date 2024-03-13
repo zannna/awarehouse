@@ -23,10 +23,14 @@ public class WorkerWarehouseService {
         return workerWarehouse;
     }
 
-    public List<BasicWarehouseInfoDto> getWarehouses(UUID workerId) {
-        return workerWarehouseRepository.findWorkerWarehousesBasicInformation(workerId).stream()
+    public List<BasicWarehouseInfoDto> getBasicWarehouses(UUID workerId) {
+        return workerWarehouseRepository.findWarehouses(workerId).stream()
                 .map((w)->new BasicWarehouseInfoDto(w.getId(), w.getName(), null)).collect(Collectors.toList());
     }
+    public List<Warehouse> getWarehouses(UUID workerId) {
+        return workerWarehouseRepository.findWarehouses(workerId);
+    }
+
     public Set<WorkerWarehouse> getWorkerWarehouses(UUID workerId){
         return workerWarehouseRepository.findWorkerWarehouses(workerId);
     }

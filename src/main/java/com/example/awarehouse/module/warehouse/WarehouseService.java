@@ -1,10 +1,12 @@
 package com.example.awarehouse.module.warehouse;
 
 import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
+import com.example.awarehouse.module.group.dto.GroupWithWarehouses;
 import com.example.awarehouse.module.token.OwnerType;
 import com.example.awarehouse.module.warehouse.dto.*;
 import com.example.awarehouse.module.group.WarehouseGroup;
 import com.example.awarehouse.module.group.WarehouseGroupService;
+import com.example.awarehouse.module.warehouse.mapper.GroupMapper;
 import com.example.awarehouse.module.warehouse.mapper.WarehouseMapper;
 import com.example.awarehouse.module.token.SharingTokenService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.GroupNotExistException;
@@ -19,6 +21,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.GROUP_NOT_EXIST;
@@ -66,7 +69,7 @@ public class WarehouseService {
 
     public List<BasicWarehouseInfoDto> getWarehouses() {
         UUID workerId = workerId();
-        return workerWarehouseService.getWarehouses(workerId);
+        return workerWarehouseService.getBasicWarehouses(workerId);
     }
 
     @Transactional
@@ -107,6 +110,38 @@ public class WarehouseService {
         WarehouseGroup group = groups.stream().filter(g->g.getId().equals(groupId)).findFirst().orElseThrow(()->new GroupNotExistException(GROUP_NOT_EXIST));
         groups.remove(group);
         warehouseRepository.save(warehouse);
+    }
+
+    public GroupAndWarehouses getAllGroupsWithWarehouses() {
+        UUID workerId = workerIdSupplier.getUserId();
+        List<WarehouseGroup> groups = groupService.getWorkerGroups(workerId);
+        Map<UUID, GroupWithWarehouses> groupMap = groups.stream()
+                .collect(Collectors.toMap(
+                        WarehouseGroup::getId,
+                        group -> new GroupWithWarehouses(GroupMapper.toBasicGroupInfoDto(group), new ArrayList<>())
+                ));
+
+        List<Warehouse> warehouses = workerWarehouseService.getWarehouses(workerId);
+        List<BasicWarehouseInfoDto> warehousesWithoutGroups = new ArrayList<>();
+
+        for (Warehouse warehouse : warehouses) {
+            Set<WarehouseGroup> warehouseGroups = warehouse.getWarehouseGroups();
+            boolean isInGroup = false;
+
+            for (WarehouseGroup warehouseGroup : warehouseGroups) {
+                GroupWithWarehouses groupWithWarehouses = groupMap.get(warehouseGroup.getId());
+                if (groupWithWarehouses != null) {
+                    groupWithWarehouses.getWarehouses().add(WarehouseMapper.toBasicWarehouseInfoDto(warehouse));
+                    isInGroup = true;
+                }
+            }
+
+            if (!isInGroup) {
+                warehousesWithoutGroups.add(WarehouseMapper.toBasicWarehouseInfoDto(warehouse));
+            }
+        }
+
+        return new GroupAndWarehouses(new ArrayList<>(groupMap.values()), warehousesWithoutGroups);
     }
 
 }

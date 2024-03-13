@@ -19,7 +19,7 @@ public interface WorkerWarehouseRepository extends JpaRepository<WorkerWarehouse
     Optional<WorkerWarehouse> findByWarehouseIdAndWorkerId(UUID warehouseId, UUID workerId);
 
     @Query("select ww.warehouse from WorkerWarehouse ww where ww.worker.id = :workerId")
-    List<Warehouse> findWorkerWarehousesBasicInformation(UUID workerId);
+    List<Warehouse> findWarehouses(UUID workerId);
 
     @Query("select distinct ww from WorkerWarehouse ww where ww.worker.id =:workerId ")
     Set<WorkerWarehouse> findWorkerWarehouses(UUID workerId);

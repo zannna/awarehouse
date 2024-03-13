@@ -1,6 +1,7 @@
 package com.example.awarehouse.module.warehouse.controller;
 
 import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
+import com.example.awarehouse.module.group.dto.GroupWithWarehouses;
 import com.example.awarehouse.module.warehouse.WarehouseService;
 import com.example.awarehouse.module.warehouse.dto.*;
 import jakarta.validation.Valid;
@@ -62,10 +63,18 @@ public class WarehouseController {
         Map<BasicGroupInfoDto, Set<BasicWarehouseInfoDto>> groupWithWarehouses = warehouseService.getGroupsAssociatedWithWarehouse(warehouseId);
         return ResponseEntity.status(HttpStatus.OK).body(groupWithWarehouses);
     }
+
     @PutMapping("/{warehouseId}/row")
     ResponseEntity<HttpStatus> updateWarehouseNumberOfRows(@PathVariable UUID warehouseId,  @RequestParam(name = "rowsNumber")  Integer rowsNumber){
         warehouseService.updateWarehouseNumberOfRows(warehouseId, rowsNumber);
         return  ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @GetMapping(URI_GROUP)
+    ResponseEntity<GroupAndWarehouses> getAllGroupsWithWarehouses(){
+        GroupAndWarehouses groups =warehouseService.getAllGroupsWithWarehouses();
+        return  ResponseEntity.status(HttpStatus.OK).body(groups);
+    }
+
 
 }

@@ -34,12 +34,6 @@ public class WarehouseGroupController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping
-    ResponseEntity<List<GroupWithWarehouses>> getAllGroupsWithWarehouses(){
-        List<GroupWithWarehouses> groups = groupService.getAllGroupsWithWarehouses();
-        return  ResponseEntity.status(HttpStatus.OK).body(groups);
-    }
-
     @GetMapping("/admin")
     ResponseEntity<Set<BasicInfo>> getAllAdminGroups(){
         Set<BasicInfo> groups =groupService.getAllAdminGroups();
