@@ -15,4 +15,6 @@ public interface ReportRepository extends JpaRepository<Report, UUID> {
 
     @Query(value = "SELECT * FROM Report r WHERE r.next_generation_date  AT TIME ZONE 'UTC' < :currentUTCTime", nativeQuery = true)
     Page<Report> findToGenerate(ZonedDateTime currentUTCTime, Pageable pageable);
+
+    List<Report> findByOwnerId(UUID userId);
 }

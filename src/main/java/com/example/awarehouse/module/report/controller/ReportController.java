@@ -7,6 +7,8 @@ import com.example.awarehouse.module.report.dto.ReportDto;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static com.example.awarehouse.util.Constants.*;
 
 @RestController
@@ -22,4 +24,8 @@ public class ReportController {
         return reportService.setUnderstockReport(reportCreationDto);
     }
 
+    @GetMapping
+    public List<ReportDto> getUserReports() {
+        return reportService.getUserReports();
+    }
 }

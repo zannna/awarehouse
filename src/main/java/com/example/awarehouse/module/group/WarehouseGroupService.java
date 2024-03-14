@@ -3,15 +3,12 @@ package com.example.awarehouse.module.group;
 import com.example.awarehouse.module.administration.dto.AdminWorkersDto;
 import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
 import com.example.awarehouse.module.group.dto.GroupRequest;
-import com.example.awarehouse.module.group.dto.GroupWithWarehouses;
 import com.example.awarehouse.module.token.OwnerType;
 import com.example.awarehouse.module.token.SharingTokenService;
 import com.example.awarehouse.module.warehouse.Role;
-import com.example.awarehouse.module.warehouse.Warehouse;
-import com.example.awarehouse.module.warehouse.WorkerWarehouse;
 import com.example.awarehouse.module.warehouse.WorkerWarehouseService;
 import com.example.awarehouse.module.warehouse.dto.BasicInfo;
-import com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto;
+import com.example.awarehouse.module.warehouse.mapper.GroupMapper;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.GroupDuplicateException;
 import com.example.awarehouse.module.group.mapper.WarehouseGroupMapper;
 import com.example.awarehouse.module.auth.Worker;
@@ -59,6 +56,9 @@ public class WarehouseGroupService {
 
     public Set<WarehouseGroup> getGroups(Set<UUID> groupsId) {
         return Optional.ofNullable(warehouseGroupRepository.findAllById(groupsId)).orElseGet(Collections::emptyList).stream().collect(Collectors.toSet());
+    }
+    public Set<BasicGroupInfoDto> getBasicInfoGroups(Set<UUID> groupsId){
+        return warehouseGroupRepository.findAllById(groupsId).stream().map(GroupMapper::toBasicGroupInfoDto).collect(Collectors.toSet());
     }
 
     public Optional<WarehouseGroup> getGroup(UUID groupId){

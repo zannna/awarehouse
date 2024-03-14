@@ -5,5 +5,5 @@ import com.example.awarehouse.module.report.ReportInterval;
 
 import java.util.UUID;
 
-public record ReportDto(UUID id, ReportInterval reportInterval, String email, ReportScope reportScope, UUID reportScopeId) {
+public record ReportDto(UUID id, ReportInterval reportInterval, String email, String entityName) {
 }

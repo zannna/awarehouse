@@ -21,9 +21,8 @@ private ReportRepository reportRepository;
 private ReportCommandCreator reportCommandCreator;
 private static final int PAGINATION_SIZE = 100;
 
-//    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 * * * * *")
     public void generateReport() {
-        System.out.println("koteeek");
        ZonedDateTime UTCNow = ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC);
        handleReportPage(UTCNow, PageRequest.of(0, PAGINATION_SIZE));
     }

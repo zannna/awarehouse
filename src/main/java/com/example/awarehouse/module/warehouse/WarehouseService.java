@@ -71,6 +71,10 @@ public class WarehouseService {
         UUID workerId = workerId();
         return workerWarehouseService.getBasicWarehouses(workerId);
     }
+    public List<BasicWarehouseInfoDto> getWarehouses(Set<UUID> warehouseIds) {
+        return warehouseRepository.findAllById(warehouseIds).stream().map(WarehouseMapper::toBasicWarehouseInfoDto).collect(Collectors.toList());
+    }
+
 
     @Transactional
     public void addWarehouseToGroup(UUID groupId, UUID warehouseId) {

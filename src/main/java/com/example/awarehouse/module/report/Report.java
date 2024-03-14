@@ -1,5 +1,6 @@
 package com.example.awarehouse.module.report;
 
+import com.fasterxml.jackson.databind.annotation.EnumNaming;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,18 +25,23 @@ public class Report {
 
     private String email;
 
+    @Enumerated(EnumType.STRING)
     private ReportScope reportScope;
 
     private UUID scopeEntityId;
 
     private String token;
 
-    public Report(ZonedDateTime nextGenerationDate, ReportInterval reportInterval, String email, ReportScope reportScope, UUID scopeEntityId) {
+    private UUID ownerId;
+
+    public Report(ZonedDateTime nextGenerationDate, ReportInterval reportInterval, String email,
+                  ReportScope reportScope, UUID scopeEntityId, UUID ownerId) {
         this.nextGenerationDate = nextGenerationDate;
         this.reportInterval = reportInterval;
         this.email = email;
         this.reportScope = reportScope;
         this.scopeEntityId = scopeEntityId;
+        this.ownerId = ownerId;
     }
 
     public void setToken(String token) {

@@ -8,9 +8,7 @@ import com.example.awarehouse.module.warehouse.util.exception.exceptions.WorkerN
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -34,4 +32,13 @@ public class GroupWorkerService {
         return groupWorkerRepository.findWorkers(workerId, Role.ADMIN);
     }
 
+    public Optional<WarehouseGroup> getGroup(UUID userId, UUID groupId) {
+        return groupWorkerRepository.findByGroupIdAndWorkerId(groupId, userId).map(GroupWorker::getGroup);
+    }
+    public List<WarehouseGroup> getGroups(UUID workerId, Set<UUID> groupsIds) {
+        if(groupsIds==null || groupsIds.isEmpty()){
+            return Collections.emptyList();
+        }
+        return groupWorkerRepository.findAllDistinctByWorkerIdAndGroupIdIn(workerId, groupsIds).stream().map(GroupWorker::getGroup).toList();
+    }
 }

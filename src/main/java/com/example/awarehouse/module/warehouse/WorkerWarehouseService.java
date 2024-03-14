@@ -30,6 +30,13 @@ public class WorkerWarehouseService {
     public List<Warehouse> getWarehouses(UUID workerId) {
         return workerWarehouseRepository.findWarehouses(workerId);
     }
+    public List<Warehouse> getWarehouses(UUID workerId, Set<UUID> warehouseIds) {
+        if(warehouseIds==null || warehouseIds.isEmpty()){
+            return Collections.emptyList();
+        }
+        return workerWarehouseRepository.findByWorkerIdAndWarehouseIdIn(workerId, warehouseIds).stream().map(WorkerWarehouse::getWarehouse).collect(Collectors.toList());
+    }
+
 
     public Set<WorkerWarehouse> getWorkerWarehouses(UUID workerId){
         return workerWarehouseRepository.findWorkerWarehouses(workerId);
@@ -106,5 +113,9 @@ public class WorkerWarehouseService {
 
     public void deleteWorkerWarehouses(List<WorkerWarehouse> workerWarehouses) {
         workerWarehouseRepository.deleteAllByIdInBatch(workerWarehouses.stream().map(WorkerWarehouse::getId).collect(Collectors.toList()));
+    }
+
+    public Optional<Warehouse> getWarehouse(UUID userId, UUID warehouseId) {
+        return workerWarehouseRepository.findByWarehouseIdAndWorkerId(warehouseId, userId).map(WorkerWarehouse::getWarehouse);
     }
 }
