@@ -5,6 +5,7 @@ import com.example.awarehouse.module.auth.WorkerService;
 import com.example.awarehouse.module.warehouse.Role;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.GroupNotExistException;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WorkerNotHaveAccess;
+import com.example.awarehouse.util.UserIdSupplier;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ public class GroupWorkerService {
     private final WarehouseGroupRepository warehouseGroupRepository;
     private final GroupWorkerRepository groupWorkerRepository;
     private final WorkerService workerService;
+    private  final UserIdSupplier workerIdSupplier;
 
     public void addWorkerToGroup(UUID groupId, UUID userId) {
         Worker worker = workerService.getWorker();
@@ -40,5 +42,9 @@ public class GroupWorkerService {
             return Collections.emptyList();
         }
         return groupWorkerRepository.findAllDistinctByWorkerIdAndGroupIdIn(workerId, groupsIds).stream().map(GroupWorker::getGroup).toList();
+    }
+
+    public Optional<WarehouseGroup> findByGroupName(String group) {
+        return groupWorkerRepository.findByWorkerIdAndGroupName(workerIdSupplier.getUserId(), group).map(GroupWorker::getGroup);
     }
 }

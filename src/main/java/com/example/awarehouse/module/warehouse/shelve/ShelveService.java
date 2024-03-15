@@ -152,4 +152,15 @@ public class ShelveService {
         existingTiers.stream().map(ShelveTier::getId).filter(tier -> !updatedTiersIds.contains(tier)).forEach(shelveTierService::removeShelfTier);
     }
 
+    public Optional<Shelve> findShelfWithTier(UUID warehouseId, Integer row, Integer shelfNumber, Integer tier) {
+        Optional<Shelve> optionalShelf = shelveRepository.findByWarehouseIdAndRowAndNumber(warehouseId, row, shelfNumber);
+       if(optionalShelf.isEmpty())
+           return optionalShelf;
+        Shelve shelf = optionalShelf.get();
+        shelf.getShelveTiers().stream()
+                .filter(t -> t.getNumber()== tier)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Shelve with tier " + tier + " does not exist"));
+        return optionalShelf;
+    }
 }

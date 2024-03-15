@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -51,12 +52,6 @@ public class ProductController {
         return productService.createProduct(file,  productCreationDto);
     }
 
-//    @GetMapping(URI_WAREHOUSE+"/{warehouseId}")
-//    public ResponseEntity<Page<ProductDto>> getProductsFromWarehouse(@PathVariable UUID warehouseId, @PageableDefault Pageable pageable){
-//        Page<ProductDto> products = productService.getProductsFromWarehouse(warehouseId, pageable);
-//        return  ResponseEntity.status(HttpStatus.OK).body(products);
-//    }
-
     @PostMapping(URI_SEARCH)
     public ResponseEntity<Page<ProductDto>> getProductsFromWarehouses( @RequestBody FilterDto filterDto,
                                                                        @PageableDefault Pageable pageable) {
@@ -65,7 +60,7 @@ public class ProductController {
     }
 
     @PatchMapping( URI_MOVE )
-    public  ResponseEntity<HttpStatus> moveProduct(@RequestBody MoveProductsDto moveProductsDto) {
+    public  ResponseEntity<HttpStatus> moveProduct(@Valid  @RequestBody MoveProductsDto moveProductsDto) {
         productService.moveProducts(moveProductsDto);
         return  ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -94,5 +89,9 @@ public class ProductController {
         return  ResponseEntity.status(HttpStatus.OK).body(products);
     }
 
+    @PostMapping("/import"+URI_WAREHOUSE+"/{warehouseId}")
+    ResponseEntity<ProductImportResult> importCSVFile(@PathVariable UUID warehouseId, @RequestParam("file") MultipartFile file) throws IOException {
+        return ResponseEntity.ok(productService.importProductsFromCSVFile(warehouseId, file));
+    }
 
 }

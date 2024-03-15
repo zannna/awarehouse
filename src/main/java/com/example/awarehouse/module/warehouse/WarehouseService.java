@@ -98,6 +98,7 @@ public class WarehouseService {
         return warehouse.getRowsNumber();
     }
 
+    @Transactional
     public void updateWarehouseNumberOfRows(UUID warehouseId, int rowsNumber) {
         Warehouse warehouse = getWarehouse(warehouseId).orElseThrow(()->new WarehouseNotExistException(WAREHOUSE_NOT_EXIST));
         warehouse.setRowsNumber(warehouse.getRowsNumber()+rowsNumber);

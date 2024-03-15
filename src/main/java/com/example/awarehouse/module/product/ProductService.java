@@ -17,6 +17,7 @@ import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,9 +25,14 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.WAREHOUSE_NOT_EXIST;
@@ -43,9 +49,12 @@ private ProductWarehouseRepository productWarehouseRepository;
 private WorkerWarehouseService workerWarehouseService;
 private final StorageService storageService =  new FileSystemStorageService();
 private ShelveService shelveService;
+private CSVProductService csvProductService;
+private Validator validator;
 
     @Transactional
     public ProductDto createProduct(MultipartFile file, ProductCreationDto productDto) {
+        validator.validate(productDto);
         Product savedProduct = product(productDto);
        List<ProductWarehouseDto> productWarehouses = createProductWarehouseAssociations(savedProduct, productDto.getProductWarehouses());
         setGroupAmountIfNotExist(savedProduct, productWarehouses);
@@ -203,6 +212,7 @@ private ShelveService shelveService;
 
     @Transactional
     public void moveProducts(MoveProductsDto moveProductsDto) {
+        validator.validate(moveProductsDto);
         ShelveTier tier =tierService.getShelveTier(moveProductsDto.getWarehouseId(), moveProductsDto.getShelfNumber(), moveProductsDto.getTierNumber());
         productWarehouseService.moveProductsToTier(moveProductsDto.getProductWarehouseMoveInfos(), tier);
     }
@@ -326,5 +336,20 @@ private ShelveService shelveService;
         Page<ProductDto> productPage = productRepository.findAll(spec, pageable).map(ProductMapper::toDto);
         return productPage;
     }
+    @Transactional
+    public ProductImportResult importProductsFromCSVFile(UUID warehouseId, MultipartFile file) throws IOException {
+        AtomicInteger savedRecords = new AtomicInteger(0);
+        AtomicInteger allRecords = new AtomicInteger(0);
+        AtomicInteger duplicatedItems = new AtomicInteger(0);
+        try {
+            csvProductService.processCSVRecords(warehouseId, file, savedRecords, allRecords, duplicatedItems);
+        } catch (IOException e) {
+            throw new IOException("An error occurred while importing CSV file " + e.getMessage());
+        } catch (MultipartException e) {
+            return new ProductImportResult(0, 0, 0);
+        }
+        return new ProductImportResult(allRecords.get(), savedRecords.get(), duplicatedItems.get());
+    }
+
 }
 

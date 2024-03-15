@@ -16,4 +16,6 @@ interface ShelveRepository extends JpaRepository<Shelve, UUID> {
     List<Shelve> findAllByWarehouseIdOrderByNumber(UUID warehouseId);
 
     Page<Shelve> findAllByWarehouseIdOrderByRowAscNumberAsc(UUID warehouseId, Pageable pageable);
+
+    Optional<Shelve> findByWarehouseIdAndRowAndNumber(UUID warehouseId, Integer row, Integer shelfNumber);
 }

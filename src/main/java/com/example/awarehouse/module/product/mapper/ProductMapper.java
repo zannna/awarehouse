@@ -9,16 +9,21 @@ import com.example.awarehouse.module.product.dto.*;
 import com.example.awarehouse.module.product.util.ImageUtils;
 import com.example.awarehouse.module.storage.FileSystemStorageService;
 import com.example.awarehouse.module.storage.StorageService;
+import com.example.awarehouse.module.warehouse.shelve.Dimensions;
 import com.example.awarehouse.module.warehouse.shelve.Shelve;
 import com.example.awarehouse.module.warehouse.shelve.mapper.DimensionsMapper;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.example.awarehouse.module.product.mapper.PriceConverter.extractCurrency;
+import static com.example.awarehouse.module.product.mapper.PriceConverter.extractDecimalNumberFromString;
 
 public class ProductMapper {
     private final StorageService storageService = new FileSystemStorageService();
@@ -100,7 +105,7 @@ public class ProductMapper {
                 .title(productDto.getTitle())
                 .amount(productDto.getAmountGroup())
                 .price(new Price(productDto.getPrice().getAmount(), productDto.getPrice().getCurrency()))
-                .photo(productDto.getPhoto())
+                .photo(productDto.getImage())
                 .dimensions(DimensionsMapper.toDimensions(productDto.getDimensions()))
                 .group(group)
                 .build();
@@ -178,5 +183,21 @@ public class ProductMapper {
                 .map(product -> new ProductInTierDto(product.getId(), product.getTitle(), product.getAmount(), toStringPhoto(product.getPhotoFullName())))
                 .collect(Collectors.toList());
     }
+
+    public static Product toDto(UUID id, String name, String amount, String price, String width, String height, String length) {
+        double priceValue =extractDecimalNumberFromString(price);
+        return Product.builder()
+                .id(id)
+                .title(name)
+                .amount(Integer.parseInt(amount))
+                .price(new Price( BigDecimal.valueOf(priceValue), extractCurrency(price)))
+                .dimensions(Dimensions.builder()
+                        .width(Double.parseDouble(width))
+                        .height(Double.parseDouble(height))
+                        .length(Double.parseDouble(length))
+                        .build())
+                .build();
+    }
+
 
 }

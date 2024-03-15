@@ -4,6 +4,7 @@ import com.example.awarehouse.module.administration.dto.AdminWorkersDto;
 import com.example.awarehouse.module.product.ProductWarehouse;
 import com.example.awarehouse.module.warehouse.dto.BasicWarehouseInfoDto;
 import com.example.awarehouse.module.warehouse.dto.GroupWarehouseDto;
+import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WorkerWarehouseRelationNotExist;
 import com.example.awarehouse.util.UserIdSupplier;
 import lombok.AllArgsConstructor;
@@ -117,5 +118,9 @@ public class WorkerWarehouseService {
 
     public Optional<Warehouse> getWarehouse(UUID userId, UUID warehouseId) {
         return workerWarehouseRepository.findByWarehouseIdAndWorkerId(warehouseId, userId).map(WorkerWarehouse::getWarehouse);
+    }
+
+    public Warehouse getWarehouse(UUID warehouseId) {
+        return getWarehouse(workerIdSupplier.getUserId(), warehouseId).orElseThrow(()->  new WarehouseNotExistException("Warehouse with id "+warehouseId+" does not exist"));
     }
 }

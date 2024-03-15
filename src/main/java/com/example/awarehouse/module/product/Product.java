@@ -41,7 +41,7 @@ public class Product {
     @JoinColumn(name = "group_id")
    private WarehouseGroup group;
 
-   @OneToMany(mappedBy = "product")
+   @OneToMany(mappedBy = "product", cascade = CascadeType.PERSIST, orphanRemoval = true)
    private Set<ProductWarehouse> productWarehouses = new HashSet<>();
 
     public Product(String title, double amount, Price price, String photo, WarehouseGroup group) {

@@ -25,4 +25,20 @@ public class ExceptionResponseFactory {
 
         return new ResponseEntity<>(error, responseStatus);
     }
+    public static ResponseEntity<BasicErrorDto> basicErrorResponse(
+            Exception e,
+            HttpServletRequest request,
+            HttpStatus responseStatus,
+            String message
+    ) {
+        BasicErrorDto error = new BasicErrorDto(
+                Instant.now(),
+                responseStatus.value(),
+                responseStatus.getReasonPhrase(),
+                message,
+                request.getRequestURI()
+        );
+
+        return new ResponseEntity<>(error, responseStatus);
+    }
 }

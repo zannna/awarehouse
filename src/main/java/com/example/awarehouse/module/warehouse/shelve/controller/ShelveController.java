@@ -24,7 +24,7 @@ public class ShelveController {
 
     @PostMapping
     public ResponseEntity<ShelveDto> createShelve(@PathVariable UUID warehouseId, @RequestBody ShelfCreationDto shelveDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(shelveService.createShelve(warehouseId, shelveDto));
+         return ResponseEntity.status(HttpStatus.OK).body(shelveService.createShelve(warehouseId, shelveDto));
     }
 
     @PutMapping

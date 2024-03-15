@@ -2,6 +2,7 @@ package com.example.awarehouse.module.group;
 
 import com.example.awarehouse.module.warehouse.Role;
 
+import io.micrometer.core.instrument.config.MeterFilter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -25,4 +26,7 @@ public interface GroupWorkerRepository extends  JpaRepository<GroupWorker, UUID>
 
     @Query("select distinct gw.group from GroupWorker gw where gw.worker.id = :workerId")
     List<WarehouseGroup> findWorkerGroups(UUID workerId);
+
+    Optional<GroupWorker> findByWorkerIdAndGroupName(UUID userId, String group);
 }
+

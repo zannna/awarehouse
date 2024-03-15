@@ -4,6 +4,7 @@ import com.example.awarehouse.module.report.ReportService;
 import com.example.awarehouse.module.report.command.BasicReportCommandSender;
 import com.example.awarehouse.module.report.dto.ReportCreationDto;
 import com.example.awarehouse.module.report.dto.ReportDto;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class ReportController {
     BasicReportCommandSender basicReportCommandSender;
 
     @PostMapping(URI_UNDERSTOCK)
-    public ReportDto setReportForUnderstockedProductsInWarehouses(@RequestBody ReportCreationDto reportCreationDto) {
+    public ReportDto setReportForUnderstockedProductsInWarehouses(@Valid @RequestBody ReportCreationDto reportCreationDto) {
         return reportService.setUnderstockReport(reportCreationDto);
     }
 

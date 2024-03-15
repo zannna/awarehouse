@@ -2,12 +2,14 @@ package com.example.awarehouse.module.warehouse.shelve;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Embeddable
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Getter
 public class Dimensions {
     private double height=0.0;

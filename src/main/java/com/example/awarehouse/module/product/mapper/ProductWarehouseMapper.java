@@ -10,8 +10,8 @@ public class ProductWarehouseMapper {
     public static ProductWarehouseDto toDto(ProductWarehouse productWarehouse){
         if(productWarehouse == null) return null;
         ShelveTier tier = productWarehouse.getTier();
-        int shelveNumber = 0;
-        int tierNumber = 0;
+        Integer shelveNumber = null;
+        Integer tierNumber =null;
         Integer row = null;
         if (tier!=null) {
             tierNumber = tier.getNumber();
