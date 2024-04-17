@@ -2,6 +2,7 @@ package com.example.awarehouse.module.warehouse;
 
 import com.example.awarehouse.common.util.ContextMock;
 import com.example.awarehouse.module.group.dto.BasicGroupInfoDto;
+import com.example.awarehouse.module.token.OwnerType;
 import com.example.awarehouse.module.warehouse.dto.*;
 import com.example.awarehouse.module.group.WarehouseGroup;
 import com.example.awarehouse.module.token.SharingTokenService;
@@ -59,7 +60,7 @@ class WarehouseServiceTest {
         //then
         verify(warehouseRepository).save(any( Warehouse.class));
         verify(workerWarehouseService).newRelation(WAREHOUSE_ID, WORKER_ID, Role.ADMIN);
-        verify(sharingTokenService).createSharingToken(any(Warehouse.class));
+        verify(sharingTokenService).createSharingToken(any(UUID.class), any(OwnerType.class));
         assertThat(result.id()).isEqualTo(WAREHOUSE_ID);
         assertThat(result.name()).isEqualTo(warehouseCreation.name());
         assertThat(result.unit()).isEqualTo(warehouseCreation.unit().name());
@@ -72,14 +73,15 @@ class WarehouseServiceTest {
     void addWarehouseToGroup_whenDataAreValid_thenAddWarehouse(Optional<Warehouse> warehouse, Set<WarehouseGroup> givenGroups){
         //given
         contextMock.setContext();
-        Optional<WarehouseGroup> group = Optional.of(new WarehouseGroup(UUID.fromString("6b63c7bb-b829-45fb-8f84-460e4dfe2ef9"), "Group 2",WorkerFactory.createWorker()));
-        when(warehouseRepository.findById(any(UUID.class))).thenReturn(warehouse);
+        Optional<WarehouseGroup> group = Optional.of(new WarehouseGroup(UUID.fromString("1b0cbc82-236f-4846-ac08-6d88baa91294"),
+                "Group 2",WorkerFactory.createWorker(), new HashSet<>()));
+        when(warehouseRepository.findById(any())).thenReturn(warehouse);
         when(groupService.getGroup(any(UUID.class))).thenReturn(group);
         WarehouseService warehouseService = new WarehouseService(workerWarehouseService, sharingTokenService,
                 warehouseRepository, groupService, validator, userIdSupplier);
 
         //when
-        warehouseService.addWarehouseToGroup(UUID.fromString("6b63c7bb-b829-45fb-8f84-460e4dfe2ef9"), new WarehouseIdDto(warehouse.get().getId()));
+        warehouseService.addWarehouseToGroup(UUID.fromString("1b0cbc82-236f-4846-ac08-6d88baa91294"), warehouse.get().getId());
 
         //then
         Set<WarehouseGroup> receivedGroups = warehouse.get().getWarehouseGroups();
@@ -90,11 +92,11 @@ class WarehouseServiceTest {
     @Test
     public void getGroupsAssociatedWithWarehouse_whenDataAreValid_thenReturnMapWithGroupsAndWarehouses(){
         contextMock.setContext();
-        BasicGroupInfoDto group1 = new BasicGroupInfoDto(UUID.fromString("4a50b7ce-9a90-11ee-b9d1-0242ac120002"), "group 1");
-        BasicGroupInfoDto group2 = new BasicGroupInfoDto(UUID.fromString("7c1a4bc6-9a90-11ee-b9d1-0242ac120002"), "group 2");
-        BasicWarehouseInfoDto warehouse1 = new BasicWarehouseInfoDto(UUID.fromString("a8ad8360-9a90-11ee-b9d1-0242ac120002"), "warehouse 1");
-        BasicWarehouseInfoDto warehouse2 = new BasicWarehouseInfoDto(UUID.fromString("d10e7fee-9a90-11ee-b9d1-0242ac120002"), "warehouse 2");
-        BasicWarehouseInfoDto warehouse3 =new BasicWarehouseInfoDto(UUID.fromString("76cc2650-9ad4-11ee-b9d1-0242ac120002"),"warehouse 3" );
+        BasicGroupInfoDto group1 = new BasicGroupInfoDto(UUID.fromString("4a50b7ce-9a90-11ee-b9d1-0242ac120002"), "group 1", null);
+        BasicGroupInfoDto group2 = new BasicGroupInfoDto(UUID.fromString("7c1a4bc6-9a90-11ee-b9d1-0242ac120002"), "group 2", null);
+        BasicWarehouseInfoDto warehouse1 = new BasicWarehouseInfoDto(UUID.fromString("a8ad8360-9a90-11ee-b9d1-0242ac120002"), "warehouse 1", null);
+        BasicWarehouseInfoDto warehouse2 = new BasicWarehouseInfoDto(UUID.fromString("d10e7fee-9a90-11ee-b9d1-0242ac120002"), "warehouse 2", null);
+        BasicWarehouseInfoDto warehouse3 =new BasicWarehouseInfoDto(UUID.fromString("76cc2650-9ad4-11ee-b9d1-0242ac120002"),"warehouse 3", null );
         when(workerWarehouseService.getWarehouseGroups(any(UUID.class), any())).thenReturn(
                 List.of(new GroupWarehouseDto(group1,warehouse1),
                         new GroupWarehouseDto(group1, warehouse2),
@@ -116,13 +118,18 @@ class WarehouseServiceTest {
         return result;
     }
     static Stream<Arguments> warehouseProvider(){
-        Set<WarehouseGroup> group1 = Set.of(new WarehouseGroup(UUID.fromString("c30e0c43-00af-4927-b15a-1383bd394e14"), "Group 1", null));
+        Set<WarehouseGroup> group1 = new HashSet<>();
+        group1.add(new WarehouseGroup(UUID.fromString("1b0cbc82-236f-4846-ac08-6d88baa91294"),
+                "Group 1", null, new HashSet<>()));
         Optional<Warehouse> warehouse1 =Optional.of(Warehouse.builder().warehouseGroups(group1)
                 .workerWarehouses(Set.of(WorkerWarehouseFactory.createWorkerWarehouse())).build());
 
-        Set<WarehouseGroup> group2 = Set.of(new WarehouseGroup(UUID.fromString("6b63c7bb-b829-45fb-8f84-460e4dfe2ef9"), "Group 2", null));
+        Set<WarehouseGroup> group2 = new HashSet<>();
+        group2.add(new WarehouseGroup(UUID.fromString("6b63c7bb-b829-45fb-8f84-460e4dfe2ef9"),
+                "Group 2", null, new HashSet<>()));
         Optional<Warehouse> warehouse2 = Optional.of(Warehouse.builder().warehouseGroups(group2)
-                .workerWarehouses(Set.of(WorkerWarehouseFactory. createSecondWorkerWarehouse())).build());
+                .workerWarehouses(Set.of(WorkerWarehouseFactory.createSecondWorkerWarehouse()))
+                .build());
 
         return Stream.of(
                 arguments(warehouse1, group1),

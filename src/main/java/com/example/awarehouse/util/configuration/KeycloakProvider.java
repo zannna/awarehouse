@@ -26,16 +26,6 @@ public class KeycloakProvider {
 
     private Keycloak keycloak;
 
-//    @PostConstruct
-//    public void init() {
-//        keycloak = KeycloakBuilder.builder()
-//                .realm(realm)
-//                .serverUrl(serverURL)
-//                .clientId(clientID)
-//                .clientSecret(clientSecret)
-//                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-//                .build();
-//    }
 
     public Keycloak getInstance() {
         if(keycloak == null) {

@@ -25,7 +25,7 @@ public class SharingTokenController {
 
     @PostMapping
     public ResponseEntity<HttpStatus> joinWarehouse(@RequestBody SharingTokenDto sharingTokenDto){
-        sharingTokenService.joinWarehouse( sharingTokenDto);
+        sharingTokenService.join( sharingTokenDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

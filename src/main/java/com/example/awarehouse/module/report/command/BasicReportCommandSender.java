@@ -25,3 +25,12 @@ public class BasicReportCommandSender implements ReportCommandCreator {
         rabbitTemplate.convertAndSend(exchange, reportKey, command);
     }
 }
+
+
+
+
+
+
+
+
+

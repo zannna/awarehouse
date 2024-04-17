@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static com.example.awarehouse.module.warehouse.group.util.factory.WarehouseGroupFactory.warehouseGroupJson;
 import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.GROUP_NOT_EXIST;
 import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.WAREHOUSE_NOT_EXIST;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
@@ -75,30 +76,15 @@ class WarehouseControllerTest {
         mvc
                 // when
                 .perform(
-                        get(URI_VERSION_V1+URI_WAREHOUSE+"/{warehouseId}"+URI_GROUP+"/{groupId}", 1)
+                        post(URI_VERSION_V1+URI_WAREHOUSE+"/{warehouseId}"+URI_GROUP, "1b0cbc82-236f-4846-ac08-6d88baa91294")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(createWarehouseIdDto())
+                                .content(warehouseGroupJson())
                 )
                 // then
                 .andExpect(status().isOk());
     }
 
-    @ParameterizedTest
-    @MethodSource("addWarehouseToGroupException")
-    void addWarehouseToGroup_whenInValidInput_thenThrowException(RuntimeException exception, String exceptionMessage) throws Exception {
-        //given
-//        doThrow(exception).when(warehouseService).addWarehouseToGroup(any(UUID.class), any(WarehouseIdDto.class));
-//        mvc
-//                // when
-//                .perform(
-//                        get(URI_VERSION_V1+URI_WAREHOUSE+URI_GROUP+"/{groupId}", 1)
-//                                .contentType(MediaType.APPLICATION_JSON)
-//                                .content(createWarehouseIdDto())
-//                )
-//                // then
-//                .andExpect(status().isBadRequest())
-//                .andExpect((MockMvcResultMatchers.jsonPath("$.message").value(exceptionMessage)));
-    }
+
 
     static List<String> invalidWarehouseCreation(){
         return List.of(createWarehouseCreationJsonWithInvalidName(),

@@ -46,9 +46,7 @@ class SecurityConfiguration {
         http
                 .cors((cors) -> cors
                 .configurationSource( myWebsiteConfigurationSource()))
-                        //.cors(Customizer.withDefaults())
-                .csrf(csrf -> csrf.disable())
-//                .authorizeHttpRequests(requests -> requests.anyRequest().permitAll())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests ->
                 requests
                         .requestMatchers(URI_VERSION_V1 + URI_AUTH+"/**").permitAll()
@@ -57,7 +55,6 @@ class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS));
 
        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter)));
-
 
         return http.build();
     }
@@ -71,22 +68,11 @@ class SecurityConfiguration {
     @Bean
     CorsConfigurationSource myWebsiteConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*");
+        configuration.addAllowedOrigin("http://localhost:3000");
         configuration.addAllowedHeader("*");
         configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-//        CorsConfiguration corsConfiguration = new CorsConfiguration();
-////        configuration.setAllowedOrigins(Arrays.asList("*"));
-////        configuration.setAllowedMethods(Arrays.asList("*"));
-////        configuration.setAllowedHeaders(Arrays.asList("*"));
-//        corsConfiguration.setAllowedHeaders(List.of("*"));
-//        corsConfiguration.setAllowedOrigins(List.of("*"));
-//        corsConfiguration.setAllowedMethods(List.of("*"));
-//        corsConfiguration.setAllowCredentials(true);
-//       // corsConfiguration.setExposedHeaders(List.of("Authorization"));
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", corsConfiguration);
         return source;
     }
 }

@@ -39,10 +39,5 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PostMapping("/login")
-    ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
-        String accessToken = keycloakService.login(loginDto);
-        return ResponseEntity.status(HttpStatus.OK).body(accessToken);
-    }
 
 }

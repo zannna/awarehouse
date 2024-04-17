@@ -1,6 +1,8 @@
 package com.example.awarehouse.exception;
 
 import com.example.awarehouse.exception.exceptions.UserUnauthorized;
+import com.example.awarehouse.module.warehouse.util.exception.exceptions.WorkerNotHaveAccess;
+import com.example.awarehouse.module.warehouse.util.exception.exceptions.WorkerWarehouseRelationNotExist;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,8 +19,7 @@ import java.time.Instant;
 import java.util.stream.Collectors;
 
 import static com.example.awarehouse.exception.ExceptionResponseFactory.basicErrorResponse;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static org.springframework.http.HttpStatus.*;
 
 
 @ControllerAdvice
@@ -45,6 +46,11 @@ public class GeneralExceptionHandler {
     @ExceptionHandler({UserUnauthorized.class,})
     ResponseEntity<BasicErrorDto> generalUnauthorized(Exception e, HttpServletRequest request) {
         return basicErrorResponse(e, request, UNAUTHORIZED);
+    }
+
+    @ExceptionHandler({WorkerWarehouseRelationNotExist.class, WorkerNotHaveAccess.class})
+    ResponseEntity<BasicErrorDto> forbiddenException(Exception e, HttpServletRequest request) {
+        return basicErrorResponse(e, request, FORBIDDEN);
     }
 
 

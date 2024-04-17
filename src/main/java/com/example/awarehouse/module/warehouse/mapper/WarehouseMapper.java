@@ -7,6 +7,7 @@ import com.example.awarehouse.module.warehouse.dto.GroupResponseDto;
 import com.example.awarehouse.module.warehouse.dto.WarehouseCreation;
 import com.example.awarehouse.module.warehouse.dto.WarehouseResponseDto;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,9 +16,12 @@ public class WarehouseMapper {
         return new Warehouse(warehouseCreation.name(), warehouseCreation.unit(), warehouseCreation.numberOfRows(), warehouseGroups);
     }
 
-    public static WarehouseResponseDto toWarehouseResponseDto(Warehouse warehouse){
-        Set<GroupResponseDto> groups = warehouse.getWarehouseGroups().stream()
-                .map(GroupMapper::toGroupResponseDto).collect(Collectors.toSet());
+    public static WarehouseResponseDto toWarehouseResponseDto(Warehouse warehouse) {
+        Set<GroupResponseDto> groups = new HashSet<>();
+        if (warehouse.getWarehouseGroups() != null) {
+            groups = warehouse.getWarehouseGroups().stream()
+                    .map(GroupMapper::toGroupResponseDto).collect(Collectors.toSet());
+        }
         return new WarehouseResponseDto(warehouse.getId(), warehouse.getName(), warehouse.getUnit().name(), warehouse.getRowsNumber(), groups);
     }
 

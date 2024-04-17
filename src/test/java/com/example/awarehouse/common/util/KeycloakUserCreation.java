@@ -29,19 +29,20 @@ public class KeycloakUserCreation {
     WorkerRepository workerRepository;
 
 
-    public void createAdmin(String keycloakServerUrl) throws ParseException, URISyntaxException {
-        createUser(keycloakServerUrl, createAdminDataForKeycloak());
+    public Worker createAdmin(String keycloakServerUrl) throws ParseException, URISyntaxException {
+        return createUser(keycloakServerUrl, createAdminDataForKeycloak());
     }
 
-    public void createBasicUser(String keycloakServerUrl) throws ParseException, URISyntaxException {
-        createUser(keycloakServerUrl,createBasicWorkerDataForKeycloak());
+    public Worker createBasicUser(String keycloakServerUrl) throws ParseException, URISyntaxException {
+        return createUser(keycloakServerUrl,createBasicWorkerDataForKeycloak());
     }
 
-    private void createUser(String keycloakServerUrl, MultiValueMap<String, String> authenticationData) throws ParseException, URISyntaxException {
+    private Worker createUser(String keycloakServerUrl, MultiValueMap<String, String> authenticationData) throws ParseException, URISyntaxException {
         String keycloakResponse = communicateWithKeycloak(keycloakServerUrl, authenticationData);
         extractAccessToken(keycloakResponse);
         Worker worker = createWorker();
         workerRepository.save(worker);
+        return worker;
     }
 
 

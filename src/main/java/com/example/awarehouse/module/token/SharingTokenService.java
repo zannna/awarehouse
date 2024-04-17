@@ -44,13 +44,18 @@ public class SharingTokenService {
 
 
     public SharingTokenDto getSharingToken(UUID tokenOwnerId) {
-        workerService.validateIfWorkerIsAdmin(workerIdSupplier.getUserId());
-        return sharingTokenRepository.findByTokenOwnerId(tokenOwnerId)
-                .map(SharingTokenMapper::toDto)
+        SharingToken sharingToken = sharingTokenRepository.findByTokenOwnerId(tokenOwnerId)
                 .orElseThrow(() ->new WarehouseNotHasSharingToken(WAREHOUSE_NOT_CONTAIN_SHARINGTOKEN));
+        if(sharingToken.getOwnerType().equals(OwnerType.WAREHOUSE)) {
+          workerWarehouseService.validateWorkerWarehouseRelation(workerIdSupplier.getUserId(), sharingToken.getTokenOwnerId());
+        }
+        else if(sharingToken.getOwnerType().equals(OwnerType.GROUP)){
+            groupWorkerService.validateWorkerGroupRelation(sharingToken.getTokenOwnerId());
+        }
+        return SharingTokenMapper.toDto(sharingToken);
     }
 
-    public void  joinWarehouse(SharingTokenDto sharingTokenDto) {
+    public void join(SharingTokenDto sharingTokenDto) {
        SharingToken sharingToken = sharingTokenRepository.findBySharingToken( sharingTokenDto.sharingToken()).orElseThrow(()->
                 new SharingTokenNotExist(SHARINGTOKEN_NOT_EXIST));
        if(sharingToken.getOwnerType().equals(OwnerType.WAREHOUSE)) {

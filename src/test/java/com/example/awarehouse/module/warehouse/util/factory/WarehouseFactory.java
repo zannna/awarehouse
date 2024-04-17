@@ -12,12 +12,21 @@ import static com.example.awarehouse.module.warehouse.util.factory.GroupFactory.
 
 public class WarehouseFactory {
     public static Warehouse createWarehouse() {
-        return  new Warehouse(WAREHOUSE_ID, "name",  LengthUnit.METER, 3, createSetOfGroups(),
-                null, new SharingToken());
+        return  Warehouse.builder()
+                .id(WAREHOUSE_ID)
+                .name("name")
+                .unit(LengthUnit.METER)
+                .rowsNumber(3)
+                .warehouseGroups(createSetOfGroups()).
+             build();
     }
     public static Warehouse createSecondWarehouse() {
-        return  new Warehouse(WAREHOUSE_ID_2, "name2",  LengthUnit.METER, 3, new HashSet<>(),
-                new HashSet<>(), new SharingToken());
+        return Warehouse.builder()
+                .id(WAREHOUSE_ID_2)
+                .name("name 2")
+                .unit(LengthUnit.METER)
+                .rowsNumber(2)
+                .build();
     }
 
 }
