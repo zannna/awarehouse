@@ -47,4 +47,10 @@ public class GroupWorkerService {
     public Optional<WarehouseGroup> findByGroupName(String group) {
         return groupWorkerRepository.findByWorkerIdAndGroupName(workerIdSupplier.getUserId(), group).map(GroupWorker::getGroup);
     }
+    public GroupWorker validateWorkerGroupRelation(UUID groupId){
+       GroupWorker groupWorker = groupWorkerRepository.findByGroupIdAndWorkerId(groupId, workerIdSupplier.getUserId()).
+                orElseThrow(()->new WorkerNotHaveAccess("Worker does not have access to group with id "+groupId));
+       return groupWorker;
+    }
+
 }

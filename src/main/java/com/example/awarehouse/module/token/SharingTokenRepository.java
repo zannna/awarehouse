@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Repository
 public interface SharingTokenRepository extends JpaRepository<SharingToken, Long> {
-        Optional<SharingToken> findByTokenOwnerId(UUID warehouseId);
+    Optional<SharingToken> findByTokenOwnerId(UUID warehouseId);
     Optional<SharingToken> findBySharingToken(String sharingToken);
 
 }

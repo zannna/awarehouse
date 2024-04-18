@@ -5,9 +5,7 @@ import com.example.awarehouse.module.token.SharingToken;
 import com.example.awarehouse.module.warehouse.Role;
 import com.example.awarehouse.module.warehouse.WorkerWarehouse;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -18,6 +16,8 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
+@Setter
+@Builder
 public class WarehouseGroup {
     @Id
     @GeneratedValue(generator = "uuid2")

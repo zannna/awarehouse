@@ -23,6 +23,7 @@ public class SharingToken {
 
     private UUID tokenOwnerId;
 
+    @Enumerated(EnumType.STRING)
     private  OwnerType ownerType;
 
     public SharingToken(String sharingToken, String salt, UUID tokenOwnerId, OwnerType ownerType) {

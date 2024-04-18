@@ -12,7 +12,8 @@ import java.util.UUID;
 public class GroupFactory {
 
     public static Set<WarehouseGroup> createListOfGroups(){
-        return Set.of(new WarehouseGroup(UUID.fromString("c3069688-9a91-11ee-b9d1-0242ac120002"), "clothes", null), new WarehouseGroup(UUID.fromString("c4158a86-9a94-11ee-b9d1-0242ac120002"),"toys", null));
+        return Set.of(WarehouseGroup.builder().id(UUID.fromString("c3069688-9a91-11ee-b9d1-0242ac120002")).name( "clothes").build(),
+                WarehouseGroup.builder().id(UUID.fromString("c4158a86-9a94-11ee-b9d1-0242ac120002")).name("toys").build());
     }
     public  static Set<WarehouseGroup> createSetOfGroups(){
         return createListOfGroups().stream().collect(java.util.stream.Collectors.toSet());

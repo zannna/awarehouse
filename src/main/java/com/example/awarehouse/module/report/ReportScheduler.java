@@ -3,6 +3,7 @@ package com.example.awarehouse.module.report;
 import com.example.awarehouse.module.report.command.ReportCommandCreator;
 import com.example.awarehouse.module.report.dto.ReportCommand;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,14 +16,25 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@AllArgsConstructor
 public class ReportScheduler {
-private ReportRepository reportRepository;
-private ReportCommandCreator reportCommandCreator;
+private final ReportRepository reportRepository;
+private final ReportCommandCreator reportCommandCreator;
 private static final int PAGINATION_SIZE = 100;
+    @Value("${scheduling.enabled}")
+    private boolean schedulingEnabled;
 
-   // @Scheduled(cron = "0 * * * * *")
+    @Value("${scheduling.cron}")
+    private String schedulingCron;
+    public ReportScheduler(ReportRepository reportRepository, ReportCommandCreator reportCommandCreator) {
+        this.reportRepository = reportRepository;
+        this.reportCommandCreator = reportCommandCreator;
+    }
+
+    @Scheduled(cron = "${scheduling.cron}")
     public void generateReport() {
+        if (!schedulingEnabled) {
+            return;
+        }
        ZonedDateTime UTCNow = ZonedDateTime.now().withZoneSameInstant(ZoneOffset.UTC);
        handleReportPage(UTCNow, PageRequest.of(0, PAGINATION_SIZE));
     }

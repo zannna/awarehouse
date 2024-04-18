@@ -60,13 +60,14 @@ public class ProductController {
     }
 
     @PatchMapping( URI_MOVE )
-    public  ResponseEntity<HttpStatus> moveProduct(@Valid  @RequestBody MoveProductsDto moveProductsDto) {
+    public  ResponseEntity<HttpStatus> moveProduct(@Valid @RequestBody MoveProductsDto moveProductsDto) {
         productService.moveProducts(moveProductsDto);
         return  ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @RequestMapping(path = "/", method = PATCH, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<ProductDto> updateProduct(@RequestPart("product") ProductDto product, @RequestPart(name = "file", required = false) MultipartFile file) {
+    public ResponseEntity<ProductDto> updateProduct(@RequestPart("product") ProductDto product,
+                                                    @RequestPart(name = "file", required = false) MultipartFile file) {
         ProductDto productResponse = productService.updateProduct(product, file);
         return ResponseEntity.status(HttpStatus.OK).body(productResponse);
     }

@@ -12,8 +12,6 @@ import java.util.UUID;
 
 @Repository
 interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpecificationExecutor<Product> {
-    List<Product> findByGroupId(UUID uuid);
-
     @Query("SELECT p FROM Product p WHERE p.group.id= :groupId AND p.amount=0")
     List<Product> findUnderstockByGroup(UUID groupId);
     @Modifying
@@ -21,6 +19,4 @@ interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpecificati
     @Query("DELETE FROM Product p WHERE p.id IN :productIds")
     void deleteProductsById(List<UUID> productIds);
 
-    @Query("SELECT p FROM Product p WHERE p.group.id IN :groupIds")
-    List<Product> findProductsWithOnlyGroup(List<UUID> groupIds);
 }

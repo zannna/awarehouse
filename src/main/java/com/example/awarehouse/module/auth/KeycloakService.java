@@ -58,11 +58,4 @@ public class KeycloakService {
         return  passwordCredentials;
     }
 
-    public String login(LoginDto loginDto) {
-        Keycloak keycloak = keycloakProvider.getUserInstance(loginDto.email(), loginDto.password());
-        AccessTokenResponse tokenResponse = keycloak.tokenManager().getAccessToken();
-        return tokenResponse.getToken();
-    }
-
-
 }

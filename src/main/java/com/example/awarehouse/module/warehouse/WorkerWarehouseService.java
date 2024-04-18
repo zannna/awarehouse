@@ -39,10 +39,6 @@ public class WorkerWarehouseService {
     }
 
 
-    public Set<WorkerWarehouse> getWorkerWarehouses(UUID workerId){
-        return workerWarehouseRepository.findWorkerWarehouses(workerId);
-    }
-
     public boolean validateWorkerWarehouseRelation(ProductWarehouse productWarehouse){
         UUID workerId = workerIdSupplier.getUserId();
         return productWarehouse
@@ -62,12 +58,12 @@ public class WorkerWarehouseService {
         validateWorkerWarehouseRelation(workerIdSupplier.getUserId(), warehouseId);
     }
 
-    public void validateWorkerWarehouseRelation(UUID workerId, UUID warehouseId){
-        boolean isWorkerWarehouseRelationExist = workerWarehouseRepository.findByWarehouseIdAndWorkerId(warehouseId, workerId).isPresent();
-        if(!isWorkerWarehouseRelationExist){
+    public WorkerWarehouse validateWorkerWarehouseRelation(UUID workerId, UUID warehouseId){
+        Optional<WorkerWarehouse> workerWarehouse = workerWarehouseRepository.findByWarehouseIdAndWorkerId(warehouseId, workerId);
+        if(workerWarehouse.isEmpty()){
             throw new WorkerWarehouseRelationNotExist("Worker with id "+workerId+" does not have relation with warehouse with id "+warehouseId);
         }
-
+        return workerWarehouse.get();
     }
     public boolean isWorkerWithAnyConnected(Set<UUID> warehouseIds){
         UUID workerId = workerIdSupplier.getUserId();

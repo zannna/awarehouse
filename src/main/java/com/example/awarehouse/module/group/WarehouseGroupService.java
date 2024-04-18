@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.example.awarehouse.module.warehouse.util.WarehouseConstants.GROUP_ALREADY_EXIST;
+import static java.util.Arrays.stream;
 
 @Service
 @AllArgsConstructor
@@ -55,7 +56,7 @@ public class WarehouseGroupService {
     }
 
     public Set<WarehouseGroup> getGroups(Set<UUID> groupsId) {
-        return Optional.ofNullable(warehouseGroupRepository.findAllById(groupsId)).orElseGet(Collections::emptyList).stream().collect(Collectors.toSet());
+        return new HashSet<>(warehouseGroupRepository.findAllById(groupsId));
     }
     public Set<BasicGroupInfoDto> getBasicInfoGroups(Set<UUID> groupsId){
         return warehouseGroupRepository.findAllById(groupsId).stream().map(GroupMapper::toBasicGroupInfoDto).collect(Collectors.toSet());
