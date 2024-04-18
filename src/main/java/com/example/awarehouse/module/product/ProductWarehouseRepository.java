@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Repository
-interface ProductWarehouseRepository extends JpaRepository<ProductWarehouse, UUID>, JpaSpecificationExecutor<ProductWarehouse> {
+public interface ProductWarehouseRepository extends JpaRepository<ProductWarehouse, UUID>, JpaSpecificationExecutor<ProductWarehouse> {
     @Query(value = "insert into product_warehouse (product_id, warehouse_id, number_of_products) values (:productId, :warehouseId, :numberOfProducts) RETURNING *", nativeQuery = true)
     ProductWarehouse createProductWarehouseAssociation( @Param("productId") UUID productId, @Param("warehouseId") UUID warehouseId,  @Param("numberOfProducts") double numberOfProducts);
 
@@ -40,4 +40,6 @@ interface ProductWarehouseRepository extends JpaRepository<ProductWarehouse, UUI
     List<ProductWarehouse> findAllByTierIn(List<ShelveTier> tiers);
 
     List<ProductWarehouse> findAllByTierIn(Set<ShelveTier> tiers);
+
+    List<ProductWarehouse> findAllByTierId(UUID tierId);
 }

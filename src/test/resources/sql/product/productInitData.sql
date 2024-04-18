@@ -1,0 +1,10 @@
+insert into warehouse(warehouse_id, name, unit, rows_number) values ('123e4567-e89b-12d3-a456-426614174000', 'warehouse1', 'METER', 3);
+insert into shelve( shelve_id, warehouse_id, name, number, size, height, width, length, row) values ('b0f8f917-6cd2-4433-b1a2-db99f0b93a21', '123e4567-e89b-12d3-a456-426614174000', 'toys', 1, false, 0, 0, 0, 1);
+insert into tier (tier_id, name, number, size, shelve_id, occupied_volume, height, width, length) values ('b0f8f917-6cd2-4433-b1a2-db99f0b93a21', 'dolls', 1, false, 'b0f8f917-6cd2-4433-b1a2-db99f0b93a21', 0, 0,0,0);
+insert into shelve( shelve_id, warehouse_id, name, number, size, height, width, length, row) values ('06910634-5597-4855-99dd-6b2a52a438c5', '123e4567-e89b-12d3-a456-426614174000', 'cars', 1, false, 0, 0, 0, 1);
+insert into tier (tier_id, name, number, size, shelve_id, occupied_volume, height, width, length) values ('45e264a7-f1f2-4b02-8d25-47b036799da9', 'speed-cars', 1, false, '06910634-5597-4855-99dd-6b2a52a438c5', 0, 0,0,0);
+insert into tier (tier_id, name, number, size, shelve_id, occupied_volume, height, width, length) values ('15a73cfc-e584-465a-ad94-a159144685ce', 'cars', 2, false, 'b0f8f917-6cd2-4433-b1a2-db99f0b93a21', 0, 0,0,0);
+insert into product (product_id, title, amount, height, width, length) values ('d8296d44-55f0-4a4a-9fd4-a02fe9f64df1', 'barbie', 5, 1, 1, 1);
+insert into product (product_id, title, amount, height, width, length) values ('7e11e9ca-d04f-4081-9a26-89c381834e73', 'car', 8, 1, 1, 1);
+insert into product_warehouse (pw_id, product_id, number_of_products, tier_id) values ('85d38561-3084-4723-8c2a-0ec0c22df642', 'd8296d44-55f0-4a4a-9fd4-a02fe9f64df1', 5,  'b0f8f917-6cd2-4433-b1a2-db99f0b93a21');
+insert into product_warehouse (pw_id, product_id, number_of_products, tier_id) values ('35b4cabd-1f9c-4c97-8b09-03a5a7450505', '7e11e9ca-d04f-4081-9a26-89c381834e73', 8,  '45e264a7-f1f2-4b02-8d25-47b036799da9');

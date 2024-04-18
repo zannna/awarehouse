@@ -4,6 +4,7 @@ import com.example.awarehouse.module.warehouse.Warehouse;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "shelve")
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Shelve {

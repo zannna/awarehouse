@@ -27,8 +27,9 @@ public class ProductWarehouseService {
                         (existing, replacement) -> existing));
         List<ProductWarehouse> productWarehouses = productWarehouseRepository.findAllById(productWarehouseMoveInfos.keySet());
         for (ProductWarehouse productWarehouse : productWarehouses) {
-            Double amount =productWarehouseMoveInfos.get(productWarehouse.getId());
+            Double amount = productWarehouseMoveInfos.get(productWarehouse.getId());
             removeProductFromTier(amount, productWarehouse);
+            tier.addOccupiedVolume(productWarehouse.getProduct().getDimensions().getVolume() * amount);
             ProductWarehouse newProductWarehouse = new ProductWarehouse(productWarehouse.getProduct(), tier.getShelve().getWarehouse(), amount, tier);
             productWarehouseRepository.save(newProductWarehouse);
         }
@@ -36,7 +37,7 @@ public class ProductWarehouseService {
 
     private void removeProductFromTier( Double amount, ProductWarehouse productWarehouse){
         removeOccupiedVolumeFromTier(amount, productWarehouse);
-        if(amount <= productWarehouse.getNumberOfProducts()){
+        if(amount >= productWarehouse.getNumberOfProducts()){
             productWarehouseRepository.delete(productWarehouse);
         }
         else{
