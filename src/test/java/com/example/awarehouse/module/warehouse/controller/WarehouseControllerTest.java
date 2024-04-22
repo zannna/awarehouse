@@ -70,6 +70,7 @@ class WarehouseControllerTest {
                 // then
                 .andExpect(status().isBadRequest());
     }
+
     @Test
     void addWarehouseToGroup_whenValidInput_thenReturnsOk() throws Exception {
         //given

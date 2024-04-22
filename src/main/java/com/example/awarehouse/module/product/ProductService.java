@@ -140,7 +140,7 @@ private Validator validator;
     }
 
     private void setGroupAmountIfNotExist(Product savedProduct, List<ProductWarehouseDto> productWarehouses){
-        if(savedProduct.getAmount()!=0){
+        if(savedProduct.getAmount()==0){
             Double amount = productWarehouses.stream().mapToDouble(ProductWarehouseDto::amount).sum();
             savedProduct.setAmount(amount);
         }
@@ -220,7 +220,7 @@ private Validator validator;
     public void deleteProducts(DeleteProductsDto deleteProductsDto) {
         productWarehouseService. removeProductWarehousesByProductIds(deleteProductsDto.getProductIds());
         productWarehouseService.removeProductWarehouses(deleteProductsDto.getProductWarehouseIds());
-        productRepository.deleteProductsById(deleteProductsDto.getProductIds());
+      productRepository.deleteProductsById(deleteProductsDto.getProductIds());
     }
 
     public Page<RowWithProducts> getProductByTier(UUID warehouseId, Pageable pageable) {
@@ -243,14 +243,17 @@ private Validator validator;
     @Transactional
     public ProductDto updateProduct(ProductDto productDto, MultipartFile file) {
         Product product = productRepository.findById(productDto.getId()).orElseThrow(()-> new IllegalArgumentException("Product with id "+productDto.getId()+" not exist"));
-        Optional<ProductWarehouse> optionalProductWarehouse = product
-                .getProductWarehouses()
-                .stream()
-                .filter(pw->pw.getId().equals(productDto.getProductWarehouses().get(0).productWarehouseId()))
-                .findFirst();
+        Optional<ProductWarehouse> optionalProductWarehouse = Optional.empty();
+        if(productDto.getProductWarehouses().size()>1) {
+            optionalProductWarehouse = product
+                    .getProductWarehouses()
+                    .stream()
+                    .filter(pw -> pw.getId().equals(productDto.getProductWarehouses().get(0).productWarehouseId()))
+                    .findFirst();
+        }
         verifyIfWorkerCanChangeProduct(product, productDto, optionalProductWarehouse);
         changeDataAssociateWithProductWarehouse( optionalProductWarehouse, product, productDto);
-        if(productDto.getGroup()!=null && productDto.getGroup().id()!=product.getGroup().getId()){
+        if(productDto.getGroup()!=null && product.getGroup()!=null && productDto.getGroup().id()!=product.getGroup().getId()){
             changeGroup(productDto, product);
         }
         product.setTitle(productDto.getTitle());
@@ -258,7 +261,9 @@ private Validator validator;
         changePhoto(file, product);
         ProductWarehouse productWarehouse = optionalProductWarehouse.orElse(null);
         productRepository.save(product);
-      return ProductMapper.toDto(product, List.of(ProductWarehouseMapper.toDto(productWarehouse)));
+        List<ProductWarehouseDto> productWarehouseDtos =new ArrayList<>();
+        productWarehouseDtos.add(ProductWarehouseMapper.toDto(productWarehouse));
+      return ProductMapper.toDto(product, productWarehouseDtos);
 
     }
     private void verifyIfWorkerCanChangeProduct(Product product, ProductDto productDto, Optional<ProductWarehouse> optionalProductWarehouse){
@@ -306,7 +311,7 @@ private Validator validator;
         if(file!=null && !file.isEmpty()){
             saveFile(file, product);
         }
-        else if(product.getPhoto()==null) {
+        else if(product.getPhoto()==null && product.getPhotoFullName()!=null){
             storageService.delete(product.getPhotoFullName());
         }
     }

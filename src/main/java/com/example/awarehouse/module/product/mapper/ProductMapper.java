@@ -167,7 +167,7 @@ public class ProductMapper {
                     .id(tier.getId())
                     .number(tier.getNumber())
                     .name(tier.getName())
-                    .occupiedVolume(tier.countOccupiedVolumePercentage())
+                    .occupiedVolume(Math.round(tier.countOccupiedVolumePercentage()))
                     .products(ProductMapper.toProductInTierDto(products))
                     .build();
             tierWithProductsDtos.add(tierWithProductsDto);

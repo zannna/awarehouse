@@ -54,6 +54,7 @@ class WarehouseServiceTest {
         WarehouseService warehouseService = new WarehouseService(workerWarehouseService, sharingTokenService,
                 warehouseRepository, groupService, validator, userIdSupplier);
         WarehouseCreation warehouseCreation = WarehouseDtoFactory.createWarehouseCreation();
+
         //when
         WarehouseResponseDto result= warehouseService.createWarehouse(warehouseCreation);
 

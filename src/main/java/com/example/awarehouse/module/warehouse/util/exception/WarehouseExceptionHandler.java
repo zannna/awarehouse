@@ -25,7 +25,7 @@ public class WarehouseExceptionHandler {
         return basicErrorResponse(e, request, NOT_FOUND);
     }
 
-    @ExceptionHandler({WorkerNotHaveAccess.class})
+    @ExceptionHandler({WorkerNotHaveAccess.class, ShelfNumberExistInWarehouse.class})
     ResponseEntity<BasicErrorDto> workerNotHaveAccessException(Exception e, HttpServletRequest request) {
         return basicErrorResponse(e, request, FORBIDDEN);
     }

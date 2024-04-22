@@ -25,7 +25,6 @@ import java.sql.SQLException;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
-//@SpringJUnitConfig(classes = { JwtDecoderConfiguration.class})
 public class TestBaseConfiguration {
 
     @LocalServerPort
@@ -35,11 +34,8 @@ public class TestBaseConfiguration {
     protected KeycloakUserCreation keycloakUserCreation;
 
    // public static KeycloakContainer keycloak =  new KeycloakContainer().withRealmImportFile("keycloak/realm-export.json");
-   public static  KeycloakContainer keycloak;
-    static {
-   keycloak = new KeycloakContainer().withRealmImportFile("keycloak/realm-export.json");
-       keycloak.start();
-   }
+   public static  KeycloakContainer keycloak = new KeycloakContainer().withRealmImportFile("keycloak/realm-export.json");
+
     @BeforeEach
     void init() {
         RestAssured.port = localPort;
@@ -57,14 +53,13 @@ public class TestBaseConfiguration {
         registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
         registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
         registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> keycloak.getAuthServerUrl() + "/realms/awarehouse");
-       // registry.add("keycloak.client.id", ()->"awarehouse-rest-api");
 
     }
 
     @BeforeAll
     public static void startContainers() {
         postgreSQLContainer.start();
-     //   keycloak.start();
+        keycloak.start();
     }
 
     @AfterAll

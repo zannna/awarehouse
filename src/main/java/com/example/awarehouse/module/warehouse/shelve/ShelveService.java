@@ -11,6 +11,7 @@ import com.example.awarehouse.module.warehouse.shelve.dto.*;
 import com.example.awarehouse.module.warehouse.shelve.mapper.ShelveMapper;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTier;
 import com.example.awarehouse.module.warehouse.shelve.tier.ShelveTierService;
+import com.example.awarehouse.module.warehouse.util.exception.exceptions.ShelfNumberExistInWarehouse;
 import com.example.awarehouse.module.warehouse.util.exception.exceptions.WarehouseNotExistException;
 import com.example.awarehouse.util.UserIdSupplier;
 import jakarta.transaction.Transactional;
@@ -20,6 +21,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,6 +36,7 @@ public class ShelveService {
     private final ShelveTierService shelveTierService;
     private final ProductWarehouseService productWarehouseService;
 
+    @Transactional
     public ShelveDto createShelve(UUID warehouseId, ShelfCreationDto shelveDto) {
         workerWarehouseService.validateWorkerWarehouseRelation(  workerIdSupplier.getUserId(), warehouseId);
         validateIfShelveNumberNotExistInWarehouse(warehouseId,shelveDto.getNumber());
@@ -49,7 +53,7 @@ public class ShelveService {
     private void validateIfShelveNumberNotExistInWarehouse(UUID warehouseId, int number){
         boolean isShelveNumberExist = shelveRepository.findByWarehouseIdAndNumber(warehouseId, number).isPresent();
         if(isShelveNumberExist){
-            throw new IllegalArgumentException("Shelve with number "+number+" already exist");
+            throw new ShelfNumberExistInWarehouse("Shelve with number "+number+" already exist");
         }
     }
 
@@ -91,7 +95,7 @@ public class ShelveService {
     private void setSameSizeDimensionInTiers(Shelve savedShelve,  Set<ShelveTier> tiers ) {
         Dimensions dimensions = savedShelve.getDimensions();
         int tierNumber = tiers.size();
-        Dimensions tierDimension = new Dimensions(Math.round(dimensions.getHeight()/tierNumber), dimensions.getLength(), dimensions.getWidth());
+        Dimensions tierDimension = new Dimensions(new BigDecimal(dimensions.getHeight()/tierNumber).setScale(2, RoundingMode.HALF_UP).doubleValue(), dimensions.getLength(), dimensions.getWidth());
         tiers.forEach(tier -> tier.setDimensions(tierDimension));
     }
 

@@ -57,18 +57,18 @@ public class CSVProductService {
         Product product = ProductMapper.toDto(productId, name, amount, price, width, height, length);
         Optional<WarehouseGroup> groupEntity = groupWorkerService.findByGroupName(group);
         product.setGroup(groupEntity.orElse(null));
-        Warehouse warehouseEntity = workerWarehouseService.getWarehouse(warehouseId);
-        product.setProductWarehouses(Set.of(new ProductWarehouse(product, warehouseEntity, Double.parseDouble(amount))));
-        saveDataFromCSVFile(product, savedRecords, allRecords, duplicatedIds);
+        saveDataFromCSVFile(product, warehouseId, amount, savedRecords, allRecords, duplicatedIds);
     }
 
     private void saveDataFromCSVFile(
-            Product product
+            Product product, UUID warehouseId, String amount
             , AtomicInteger savedRecords, AtomicInteger allRecords, AtomicInteger duplicatedIds
     ) {
 
         if (product.getId()==null || !productRepository.existsById(product.getId())) {
-            productRepository.save(product);
+            product = productRepository.save(product);
+            Warehouse warehouseEntity = workerWarehouseService.getWarehouse(warehouseId);
+            product.setProductWarehouses(Set.of(new ProductWarehouse(product, warehouseEntity, Double.parseDouble(amount))));
             savedRecords.incrementAndGet();
         } else {
             duplicatedIds.incrementAndGet();

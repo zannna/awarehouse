@@ -52,7 +52,10 @@ public class ProductWarehouseService {
     }
     private void removeOccupiedVolumeFromTier(Double amount, ProductWarehouse productWarehouse){
         Double volume = productWarehouse.getProduct().getDimensions().getVolume();
-        productWarehouse.getTier().removeOccupiedVolume(volume*amount);
+        ShelveTier tier = productWarehouse.getTier();
+        if(tier != null){
+            tier.removeOccupiedVolume(volume * amount);
+        }
     }
     public void moveProductFromTier(UUID tierId){
         productWarehouseRepository.setTier(null, tierId);
